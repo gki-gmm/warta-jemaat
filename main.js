@@ -3,7 +3,7 @@
      * Ganti URL ini dengan path file PDF lokal Anda jika sudah siap.
      * Contoh: 'WARTA JEMAAT GKI GMM EDISI 14 Tahun ke-22 (21-12-2025).pdf'
      */
-    const currentPdfPath = 'WARTA JEMAAT GKI GMM EDISI 14 Tahun ke-22 (21-12-2025).pdf'; 
+    const currentPdfPath = '/workspaces/warta-jemaat/WARTA JEMAAT GKI GMM EDISI 14 Tahun ke-22 (21-12-2025).pdf'; 
     
     // State Global
     let flipObject = null;
