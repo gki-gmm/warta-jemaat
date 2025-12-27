@@ -1,81 +1,74 @@
-const pdfUrl = 'WARTA JEMAAT GKI GMM EDISI 14 Tahun ke-22 (21-12-2025).pdf';
-let flipBook = null;
+// Gunakan nama variabel unik untuk menghindari "already declared"
+const currentPdfPath = 'WARTA JEMAAT GKI GMM EDISI 14 Tahun ke-22 (21-12-2025).pdf';
+let flipObject = null;
 
-async function loadAndRenderPdf() {
+async function startApp() {
     const bookEl = document.getElementById('book');
-    bookEl.innerHTML = '<div style="color:white">Memuat...</div>';
-
+    
     try {
-        const loadingTask = pdfjsLib.getDocument(pdfUrl);
-        const pdf = await loadingTask.promise;
-        const totalPages = pdf.numPages;
-        document.getElementById('pageTotal').innerText = totalPages;
-
-        bookEl.innerHTML = '';
+        const pdf = await pdfjsLib.getDocument(currentPdfPath).promise;
+        document.getElementById('pageTotal').innerText = pdf.numPages;
+        
         const fragment = document.createDocumentFragment();
 
-        for (let i = 1; i <= totalPages; i++) {
+        for (let i = 1; i <= pdf.numPages; i++) {
             const page = await pdf.getPage(i);
-            const viewport = page.getViewport({ scale: 2 }); // Scale tinggi agar tajam
+            const viewport = page.getViewport({ scale: 2 }); // Kualitas tinggi
 
             const div = document.createElement('div');
             div.className = 'my-page';
-            
-            // Logika Hard Cover: Hanya halaman 1 dan Terakhir
-            div.dataset.density = (i === 1 || i === totalPages) ? 'hard' : 'soft';
+            // Density hard untuk halaman 1 dan terakhir (Sampul)
+            div.dataset.density = (i === 1 || i === pdf.numPages) ? 'hard' : 'soft';
 
             const canvas = document.createElement('canvas');
             canvas.width = viewport.width;
             canvas.height = viewport.height;
             
-            const context = canvas.getContext('2d');
-            await page.render({ canvasContext: context, viewport: viewport }).promise;
-
+            await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
             div.appendChild(canvas);
             fragment.appendChild(div);
         }
 
         bookEl.appendChild(fragment);
-        initFlipBook();
-
-    } catch (e) {
-        bookEl.innerHTML = `<div style="color:white">Error: ${e.message}</div>`;
+        bookEl.style.display = 'block'; // Tampilkan setelah semua siap
+        
+        setupFlipbook();
+    } catch (err) {
+        console.error(err);
     }
 }
 
-function initFlipBook() {
+function setupFlipbook() {
     const isMobile = window.innerWidth < 768;
+    if (flipObject) flipObject.destroy();
 
-    if (flipBook) flipBook.destroy();
-
-    flipBook = new St.PageFlip(document.getElementById('book'), {
+    flipObject = new St.PageFlip(document.getElementById('book'), {
         width: 595,
         height: 842,
         size: "stretch",
-        minWidth: 315,
-        maxWidth: 1000,
-        minHeight: 420,
-        maxHeight: 1350,
-        showCover: true, // WAJIB untuk buka-tutup rapi
+        showCover: true, // Membuat buka-tutup rapi di tengah
         mode: isMobile ? "portrait" : "double",
         clickEventForward: false,
         useMouseEvents: true,
         maxShadowOpacity: 0.5,
     });
 
-    flipBook.loadFromHTML(document.querySelectorAll('.my-page'));
-
-    flipBook.on('flip', (e) => {
+    flipObject.loadFromHTML(document.querySelectorAll('.my-page'));
+    
+    flipObject.on('flip', (e) => {
         document.getElementById('pageInfo').innerText = e.data + 1;
     });
 }
 
-// Event Listeners
-document.getElementById('prevBtn').onclick = () => flipBook.flipPrev();
-document.getElementById('nextBtn').onclick = () => flipBook.flipNext();
+// Navigasi
+document.getElementById('prevBtn').onclick = () => flipObject && flipObject.flipPrev();
+document.getElementById('nextBtn').onclick = () => flipObject && flipObject.flipNext();
 
+// Handle Resize dengan Delay
+let timeoutHandle;
 window.addEventListener('resize', () => {
-    setTimeout(initFlipBook, 200);
+    clearTimeout(timeoutHandle);
+    timeoutHandle = setTimeout(setupFlipbook, 300);
 });
 
-loadAndRenderPdf();
+startApp();
