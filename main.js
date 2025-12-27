@@ -9,24 +9,20 @@ let pageFlip = null;
 
 function initFlipbook() {
     const isMobile = window.innerWidth < 768;
-    const bookContainer = document.getElementById('book');
+    
+    if (pageFlip) pageFlip.destroy();
 
-    if (pageFlip) {
-        pageFlip.destroy(); // Bersihkan instance lama
-    }
-
-    pageFlip = new St.PageFlip(bookContainer, {
+    pageFlip = new St.PageFlip(document.getElementById('book'), {
         width: 595,
         height: 842,
         size: "stretch",
-        minWidth: 100,
-        maxWidth: 2000,
-        minHeight: 100,
-        maxHeight: 2000,
-        showCover: true,
-        mode: isMobile ? "portrait" : "double", // Otomatis 1 halaman di HP, 2 di Desktop
-        clickEventForward: true,
-        useMouseEvents: true
+        showCover: true, // Efek sampul buku
+        mode: isMobile ? "portrait" : "double",
+        clickEventForward: false, // Matikan klik otomatis agar tidak bentrok dengan tombol samping
+        useMouseEvents: true,
+        swipeDistance: 30,
+        maxShadowOpacity: 0.5,
+        showPageCorners: true
     });
 
     const pages = document.querySelectorAll('.my-page');
@@ -34,67 +30,51 @@ function initFlipbook() {
         pageFlip.loadFromHTML(pages);
     }
 
+    // Update Nomor Halaman
     pageFlip.on('flip', (e) => {
-        document.getElementById('pageInfo').innerText = e.data + 1;
+        document.getElementById('pageInfo').innerText = (e.data + 1);
     });
 }
-
-// listener agar saat ditarik/desktop diresize tetap rapi
-window.addEventListener('resize', () => {
-    initFlipbook();
-});
 
 async function loadPdf() {
     try {
         const loadingTask = pdfjsLib.getDocument(pdfUrl);
         const pdf = await loadingTask.promise;
-        
-        bookElement.innerHTML = ''; // Bersihkan loading
+        const bookElement = document.getElementById('book');
+        bookElement.innerHTML = ''; 
 
         for (let i = 1; i <= pdf.numPages; i++) {
             const page = await pdf.getPage(i);
             const div = document.createElement('div');
             div.className = 'my-page';
             
-            // Halaman pertama dan terakhir dibuat kaku (hard cover)
-            if (i === 1 || i === pdf.numPages) div.dataset.density = 'hard';
-            
+            // PERBAIKAN EFEK: Halaman 1 & 2 (sampul depan) dan terakhir (sampul belakang) dibuat keras
+            if (i === 1 || i === pdf.numPages) {
+                div.dataset.density = 'hard';
+            }
+
             const canvas = document.createElement('canvas');
             const context = canvas.getContext('2d');
+            const viewport = page.getViewport({ scale: 1.5 });
             
-            // Gunakan scale 1.5 - 2.0 agar tajam tapi tidak berat
-            const viewport = page.getViewport({ scale: 1.5 }); 
             canvas.width = viewport.width;
             canvas.height = viewport.height;
 
             await page.render({ canvasContext: context, viewport: viewport }).promise;
-
             div.appendChild(canvas);
             bookElement.appendChild(div);
         }
 
         initFlipbook();
-        pageFlip.loadFromHTML(document.querySelectorAll('.my-page'));
-        
-        // Update nomor halaman
-        pageFlip.on('flip', (e) => {
-            document.getElementById('pageInfo').innerText = e.data + 1;
-        });
 
     } catch (error) {
-        console.error("Error: " + error);
-        bookElement.innerHTML = `<p style="padding:20px;">Gagal memuat PDF. Pastikan file tersedia.</p>`;
+        console.error("PDF Error:", error);
     }
 }
 
-// Navigasi
-document.getElementById('btnPrev').onclick = () => pageFlip.flipPrev();
-document.getElementById('btnNext').onclick = () => pageFlip.flipNext();
+// Navigasi Samping
+document.querySelector('.nav-left').onclick = () => pageFlip.flipPrev();
+document.querySelector('.nav-right').onclick = () => pageFlip.flipNext();
 
-// Handle perubahan ukuran layar (Responsive tajam)
-window.addEventListener('resize', () => {
-    initFlipbook();
-    pageFlip.loadFromHTML(document.querySelectorAll('.my-page'));
-});
-
+window.addEventListener('resize', initFlipbook);
 loadPdf();

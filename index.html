@@ -10,21 +10,22 @@
 <body>
 
     <div class="container">
-        
-        <a id="docName" class="file-name" href="#" download target="_blank">
-    &#128190; </a>
+        <a id="docName" class="file-name" href="#" download target="_blank">📥 Download PDF</a>
 
-        <div id="book"></div>
-        
-        <div class="controls">
-            <button id="btnPrev" title="Sebelumnya">&#10094;</button>
-            
-            <span id="pageInfo">1</span>
-            
-            <button id="btnNext" title="Selanjutnya">&#10095;</button>
+        <div class="nav-side nav-left">
+            <div class="nav-btn">&#10094;</div>
         </div>
-    </div>
 
+        <div id="book">
+            <p style="color:white;">Memuat Warta Jemaat...</p>
+        </div>
+
+        <div class="nav-side nav-right">
+            <div class="nav-btn">&#10095;</div>
+        </div>
+
+        <div class="page-badge">Halaman: <span id="pageInfo">1</span></div>
+    </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
