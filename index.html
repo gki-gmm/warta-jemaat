@@ -8,24 +8,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
+<div class="container">
+    <a id="docName" class="file-name" href="#" download target="_blank"></a>
 
-    <div class="container">
-        <a id="docName" class="file-name" href="#" download target="_blank">📥 Download PDF</a>
+    <div class="nav-side nav-left"><div class="nav-btn">&#10094;</div></div>
+    <div class="nav-side nav-right"><div class="nav-btn">&#10095;</div></div>
 
-        <div class="nav-side nav-left">
-            <div class="nav-btn">&#10094;</div>
-        </div>
+    <div id="book"></div>
 
-        <div id="book">
-            <p style="color:white;">Memuat Warta Jemaat...</p>
-        </div>
-
-        <div class="nav-side nav-right">
-            <div class="nav-btn">&#10095;</div>
-        </div>
-
-        <div class="page-badge">Halaman: <span id="pageInfo">1</span></div>
-    </div>
+    <div class="page-badge">Halaman: <span id="pageInfo">1</span></div>
+</div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';

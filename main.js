@@ -1,20 +1,26 @@
+// --- KONFIGURASI ---
 const pdfUrl = 'WARTA JEMAAT GKI GMM EDISI 14 Tahun ke-22 (21-12-2025).pdf';
-const bookElement = document.getElementById('book');
-const docNameElement = document.getElementById('docName');
+// Gunakan let atau pastikan hanya dideklarasikan satu kali di paling atas
+let pageFlipInstance = null;
+const elBook = document.getElementById('book');
+const elPageInfo = document.getElementById('pageInfo');
+const elDocLink = document.getElementById('docName');
 
-docNameElement.innerText = "📥 " + pdfUrl;
-docNameElement.href = pdfUrl;
+// Set link download
+if (elDocLink) {
+    elDocLink.innerText = "📥 Download PDF";
+    elDocLink.href = pdfUrl;
+}
 
-let pageFlip = null;
-const bookElement = document.getElementById('book');
-
-// Fungsi inisialisasi Flipbook
 function initFlipbook() {
     const isMobile = window.innerWidth < 768;
     
-    if (pageFlip) pageFlip.destroy();
+    // Hancurkan instance lama jika ada sebelum membuat yang baru
+    if (pageFlipInstance) {
+        pageFlipInstance.destroy();
+    }
 
-    pageFlip = new St.PageFlip(bookElement, {
+    pageFlipInstance = new St.PageFlip(elBook, {
         width: 595,
         height: 842,
         size: "stretch",
@@ -28,22 +34,22 @@ function initFlipbook() {
     });
 
     const pages = document.querySelectorAll('.my-page');
-    pageFlip.loadFromHTML(pages);
+    if (pages.length > 0) {
+        pageFlipInstance.loadFromHTML(pages);
+    }
 
-    pageFlip.on('flip', (e) => {
-        document.getElementById('pageInfo').innerText = e.data + 1;
+    // Update Nomor Halaman
+    pageFlipInstance.on('flip', (e) => {
+        elPageInfo.innerText = e.data + 1;
     });
 }
 
 async function loadPdf() {
     try {
-        // Tampilkan teks loading saat proses render
-        bookElement.innerHTML = `<div id="loading-status">Menyiapkan Halaman...</div>`;
+        elBook.innerHTML = `<div style="color:white;text-align:center;padding:20px;">Menyiapkan Warta...</div>`;
         
         const loadingTask = pdfjsLib.getDocument(pdfUrl);
         const pdf = await loadingTask.promise;
-        
-        // Simpan semua elemen halaman dalam fragment agar tidak muncul satu-satu (menghindari berantakan)
         const fragment = document.createDocumentFragment();
 
         for (let i = 1; i <= pdf.numPages; i++) {
@@ -51,14 +57,13 @@ async function loadPdf() {
             const div = document.createElement('div');
             div.className = 'my-page';
             
-            // Set Density: Hard untuk halaman 1 dan Terakhir
+            // Efek sampul kaku untuk halaman pertama dan terakhir
             div.dataset.density = (i === 1 || i === pdf.numPages) ? 'hard' : 'soft';
 
             const canvas = document.createElement('canvas');
             const context = canvas.getContext('2d');
-            
-            // Gunakan scale yang konsisten
             const viewport = page.getViewport({ scale: 1.5 });
+            
             canvas.width = viewport.width;
             canvas.height = viewport.height;
 
@@ -67,28 +72,26 @@ async function loadPdf() {
             fragment.appendChild(div);
         }
 
-        // Hapus status loading dan masukkan semua halaman sekaligus
-        bookElement.innerHTML = '';
-        bookElement.appendChild(fragment);
+        elBook.innerHTML = ''; 
+        elBook.appendChild(fragment);
 
-        // Berikan jeda sedikit agar DOM siap sebelum Flipbook di-init
-        setTimeout(() => {
-            initFlipbook();
-        }, 100);
+        // Tunggu sebentar agar browser merender canvas sebelum Flipbook dihitung
+        setTimeout(initFlipbook, 200);
 
     } catch (error) {
-        bookElement.innerHTML = `<p style="color:white;">Gagal memuat: ${error.message}</p>`;
+        elBook.innerHTML = `<p style="color:white;padding:20px;">Gagal: ${error.message}</p>`;
     }
 }
 
 // Navigasi Samping
-document.querySelector('.nav-left').onclick = () => pageFlip && pageFlip.flipPrev();
-document.querySelector('.nav-right').onclick = () => pageFlip && pageFlip.flipNext();
+document.querySelector('.nav-left').onclick = () => pageFlipInstance && pageFlipInstance.flipPrev();
+document.querySelector('.nav-right').onclick = () => pageFlipInstance && pageFlipInstance.flipNext();
 
-// Perbaikan: Gunakan ResizeObserver untuk menangani embed yang ukurannya berubah-ubah
-const resizeObserver = new ResizeObserver(() => {
-    if (pageFlip) initFlipbook();
+// Deteksi perubahan ukuran layar (Resize)
+let resizeTimer;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(initFlipbook, 300);
 });
-resizeObserver.observe(document.body);
 
 loadPdf();
