@@ -1,0 +1,29 @@
+#book-viewport {
+    width: 95vw;
+    height: 80vh; /* Sisakan ruang untuk elemen di bawahnya */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: visible; /* Penting agar bayangan halaman tidak terpotong */
+}
+
+#book {
+    margin: auto;
+    /* Kunci ukuran minimum agar tidak hilang saat di-zoom */
+    min-width: 250px; 
+    min-height: 350px;
+}
+
+.my-page {
+    background-color: white;
+    box-shadow: 0 0 25px rgba(0,0,0,0.6);
+    /* Mencegah kanvas meluap keluar halaman */
+    overflow: hidden; 
+}
+
+canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain; /* Menjaga teks tidak lonjong */
+}
