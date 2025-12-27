@@ -3,29 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Warta Jemaat</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <title>Warta Jemaat Digital</title>
+    <!-- Menggunakan Font Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    
 </head>
 <body>
-<div class="container">
-    <div class="nav-side nav-left" id="prevBtn"><div class="nav-btn">&#10094;</div></div>
-    <div class="nav-side nav-right" id="nextBtn"><div class="nav-btn">&#10095;</div></div>
 
-    <div id="book-viewport">
-        <div id="book">
-            </div>
+<div class="container">
+    <!-- Loading Overlay -->
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <div class="loading-text" id="loadingText">Memuat Aplikasi...</div>
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
     </div>
 
-    <div class="page-badge"><span id="pageInfo">1</span> / <span id="pageTotal">--</span></div>
-</div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-    <script>
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-    </script>
+    <!-- Navigasi Kiri -->
+    <div class="nav-side nav-left" id="prevBtn" title="Halaman Sebelumnya">
+        <div class="nav-btn">&#10094;</div>
+    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.js"></script>
-    
-    <script src="main.js"></script>
+    <!-- Area Buku -->
+    <div id="book-viewport">
+        <div id="book">
+            <!-- Halaman akan di-generate di sini -->
+        </div>
+    </div>
+
+    <!-- Navigasi Kanan -->
+    <div class="nav-side nav-right" id="nextBtn" title="Halaman Selanjutnya">
+        <div class="nav-btn">&#10095;</div>
+    </div>
+
+    <!-- Kontrol Bawah -->
+    <div class="controls-bar">
+        <div class="page-badge">
+            Halaman <span id="pageInfo">0</span> / <span id="pageTotal">--</span>
+        </div>
+    </div>
+</div>
+
+<!-- PDF.js Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+<script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+</script>
+
+<!-- PageFlip Library -->
+<script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.js"></script>
+
 </body>
 </html>
