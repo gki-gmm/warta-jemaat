@@ -9,14 +9,14 @@
 </head>
 <body>
 <div class="container">
-    <a id="docName" class="file-name" href="#" download target="_blank"></a>
+    <div class="nav-side nav-left" id="prevBtn"><div class="nav-btn">&#10094;</div></div>
+    <div class="nav-side nav-right" id="nextBtn"><div class="nav-btn">&#10095;</div></div>
 
-    <div class="nav-side nav-left"><div class="nav-btn">&#10094;</div></div>
-    <div class="nav-side nav-right"><div class="nav-btn">&#10095;</div></div>
+    <div id="book-container">
+        <div id="book"></div>
+    </div>
 
-    <div id="book"></div>
-
-    <div class="page-badge">Halaman: <span id="pageInfo">1</span></div>
+    <div class="page-badge"><span id="pageInfo">1</span> / <span id="pageTotal">--</span></div>
 </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script>
