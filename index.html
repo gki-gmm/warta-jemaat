@@ -4,12 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Warta Jemaat Online</title>
+    
+    <!-- Favicon dummy untuk menghilangkan error 404 di console -->
+    <link rel="icon" href="data:,">
 
     <style>
         :root {
             --bg-color: #2c3e50;
             --paper-color: #fdfbf7;
-            --shadow-strength: 0.4;
         }
 
         body {
@@ -22,7 +24,7 @@
             justify-content: center;
             align-items: center;
             font-family: sans-serif;
-            overflow: hidden; /* Mencegah scroll browser asli */
+            overflow: hidden;
         }
 
         /* Loading Overlay */
@@ -55,22 +57,19 @@
         .book-container {
             position: relative;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            transition: transform 0.3s ease;
         }
 
         #flipbook {
             display: none; /* Akan di-show via JS */
         }
 
-        /* Styling Halaman (Page) */
+        /* Styling Halaman */
         .page {
             background-color: var(--paper-color);
             overflow: hidden;
-            /* Efek Kertas Realistis */
             border-left: 1px solid rgba(0,0,0,0.1); 
         }
 
-        /* Shadow dalam halaman agar tidak terlalu putih polos */
         .page-wrapper {
             width: 100%;
             height: 100%;
@@ -83,13 +82,8 @@
         .page img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Mengisi halaman penuh */
+            object-fit: cover;
             display: block;
-        }
-
-        /* Shadow dinamis saat membalik halaman (Turn.js classes) */
-        .page.shadow {
-            box-shadow: inset 0 0 30px rgba(0,0,0,0.1);
         }
 
         /* Controls Navigasi */
@@ -134,13 +128,14 @@
             background: rgba(255,255,255,0.2);
         }
 
-        /* Pesan Error */
         #error-msg {
             display: none;
             text-align: center;
             color: #ff6b6b;
             padding: 20px;
             max-width: 400px;
+            background: rgba(0,0,0,0.8);
+            border-radius: 8px;
         }
     </style>
 </head>
@@ -155,7 +150,7 @@
     <!-- Error Message -->
     <div id="error-msg">
         <h3>File Tidak Ditemukan</h3>
-        <p>Pastikan Anda memiliki file bernama <strong>WARTA JEMAAT GKI GMM EDISI 16 Tahun ke-22 (04-01-2026)</strong> di folder ini.</p>
+        <p>Pastikan Anda memiliki file bernama <strong>WARTA JEMAAT GKI GMM EDISI 16 Tahun ke-22 (04-01-2026).pdf</strong> di folder yang sama dengan file HTML ini.</p>
     </div>
 
     <!-- Area Buku -->
@@ -178,10 +173,8 @@
 
     <script>
         // --- KONFIGURASI ---
-        const PDF_FILENAME = 'WARTA JEMAAT GKI GMM EDISI 16 Tahun ke-22 (04-01-2026).pdf'; // Nama file PDF Anda
-        const BASE_WIDTH_DESKTOP = 900; // Lebar total buku di desktop (2 halaman)
-        const BASE_WIDTH_MOBILE = 100;  // Lebar persentase layar di mobile
-        const SCALE_QUALITY = 1.5;      // Kualitas render gambar (1.5 = retina ready)
+        const PDF_FILENAME = 'WARTA JEMAAT GKI GMM EDISI 16 Tahun ke-22 (04-01-2026).pdf';
+        const SCALE_QUALITY = 1.5;
         
         // --- STATE ---
         let pdfDoc = null;
@@ -196,22 +189,16 @@
             await loadPdf();
         });
 
-        // Fungsi Utama Load PDF
         async function loadPdf() {
             try {
-                // Coba ambil file WARTA JEMAAT GKI GMM EDISI 16 Tahun ke-22 (04-01-2026)
                 const loadingTask = pdfjsLib.getDocument(PDF_FILENAME);
                 pdfDoc = await loadingTask.promise;
                 
                 updateLoadingText(`Menemukan ${pdfDoc.numPages} halaman. Merender...`);
                 
-                // Render semua halaman ke dalam DOM
                 await renderAllPages(pdfDoc);
-                
-                // Setup Buku setelah halaman siap
                 setupBook();
                 
-                // Sembunyikan loading, tampilkan kontrol
                 $('#loading').fadeOut();
                 $('#controls').addClass('active');
 
@@ -222,41 +209,33 @@
             }
         }
 
-        // Render Halaman
         async function renderAllPages(pdf) {
             const flipbook = $('#flipbook');
-            flipbook.empty(); // Bersihkan
+            flipbook.empty();
             
-            // Kita ambil halaman 1 dulu untuk mengetahui aspect ratio
             const page1 = await pdf.getPage(1);
-            const viewport = page1.getViewport({ scale: SCALE_QUALITY });
-            
-            // Hitung rasio (tinggi / lebar)
+            const viewport = page1.getViewport({ scale: 1 }); // Ambil viewport natural dulu
             const aspectRatio = viewport.height / viewport.width;
 
             // Tentukan ukuran dasar
             if (isMobile) {
-                // Di mobile: lebar hampir fullscreen, tinggi menyesuaikan
                 bookWidth = window.innerWidth - 20; 
                 bookHeight = bookWidth * aspectRatio;
             } else {
-                // Di desktop: lebar fix (misal 900px), tinggi menyesuaikan
-                bookWidth = BASE_WIDTH_DESKTOP;
-                bookHeight = bookWidth * (aspectRatio / 2); // Karena 2 halaman jadi satu
+                bookWidth = 900; // Lebar tetap desktop
+                bookHeight = bookWidth * (aspectRatio / 2); 
             }
 
-            // Loop render semua halaman
             for (let i = 1; i <= pdf.numPages; i++) {
                 const page = await pdf.getPage(i);
                 
-                // Canvas sementara untuk render
                 const canvas = document.createElement('canvas');
                 const context = canvas.getContext('2d');
                 
-                // Jika mobile, scale harus disesuaikan agar tajam di lebar layar
-                // Jika desktop, scale disesuaikan dengan setengah lebar buku
-                const pageRenderWidth = isMobile ? bookWidth * SCALE_QUALITY : (bookWidth / 2) * SCALE_QUALITY;
-                const newViewport = page.getViewport({ scale: SCALE_QUALITY * (pageRenderWidth / viewport.width) });
+                // Hitung scale untuk render gambar tajam
+                const targetWidth = isMobile ? bookWidth : (bookWidth / 2);
+                const scaleNeeded = (targetWidth * SCALE_QUALITY) / viewport.width;
+                const newViewport = page.getViewport({ scale: scaleNeeded });
 
                 canvas.height = newViewport.height;
                 canvas.width = newViewport.width;
@@ -265,10 +244,9 @@
                 
                 const imgData = canvas.toDataURL('image/jpeg', 0.9);
                 
-                // Buat elemen HTML
                 const div = document.createElement('div');
                 div.className = 'page';
-                div.style.width = isMobile ? bookWidth + 'px' : (bookWidth / 2) + 'px';
+                div.style.width = (isMobile ? bookWidth : (bookWidth / 2)) + 'px';
                 div.style.height = bookHeight + 'px';
                 
                 const img = document.createElement('img');
@@ -281,44 +259,36 @@
             }
         }
 
-        // Setup Turn.js
         function setupBook() {
             const flipbook = $('#flipbook');
             
-            // Hapus instance lama jika ada
+            // Pastikan bersih sebelum init ulang
             if (flipbook.data('turn')) {
                 flipbook.turn("destroy");
+                flipbook.turn("disable"); // Matikan interaksi sebentar
             }
 
             flipbook.turn({
                 width: bookWidth,
                 height: bookHeight,
-                autoCenter: true,
-                duration: 1200,       // Lebih lambat = lebih elegan
-                acceleration: true,   // Percepatan di akhir flip
-                gradients: true,      // Efek shading saat berbalik
-                elevation: 50,        // Ketinggian saat mencengkeram kertas
+                autoCenter: true, // Biarkan turn.js yang mengatur center
+                duration: 1000,
+                acceleration: true,
+                gradients: true,
+                elevation: 50,
+                display: isMobile ? "single" : "double", // Set display langsung di awal
                 when: {
                     turning: function(e, page, view) {
-                        // Logika tambahan saat balik halaman
+                        // console.log("Turning");
                     }
                 }
             });
-
-            // Tentukan tampilan single/double
-            if (isMobile) {
-                flipbook.turn("display", "single");
-            } else {
-                flipbook.turn("display", "double");
-            }
         }
 
-        // Update Loading Text
         function updateLoadingText(msg) {
             $('#loading-text').text(msg);
         }
 
-        // Navigasi
         window.prevPage = function() {
             $("#flipbook").turn("previous");
         }
@@ -326,7 +296,7 @@
             $("#flipbook").turn("next");
         }
 
-        // Handle Resize (Responsive Switching)
+        // Handle Resize
         let resizeTimeout;
         $(window).resize(function() {
             clearTimeout(resizeTimeout);
@@ -336,16 +306,13 @@
         function handleResize() {
             const newIsMobile = window.innerWidth <= 768;
             
-            // Jika status berubah (Mobile -> Desktop atau sebaliknya)
+            // Hanya reload jika mode berubah drastis (Mobile <-> Desktop)
+            // Ini mencegah error "center is invalid value" saat resize kecil
             if (newIsMobile !== isMobile) {
-                isMobile = newIsMobile;
-                // Kita perlu reload halaman untuk mengubah ukuran render secara bersih
-                // Atau kita bisa coba resize turn.js, tapi render ulang lebih aman untuk resolusi gambar.
                 location.reload(); 
-            } else {
-                // Jika hanya sedikit perubahan ukuran di mode yang sama, centering ulang saja
-                $("#flipbook").turn("center");
             }
+            // Untuk resize kecil dalam mode yang sama, kita biarkan CSS centering bekerja
+            // dan TIDAK memanggil fungsi turn("center") manual.
         }
     </script>
 </body>
