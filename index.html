@@ -2,358 +2,351 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Warta Jemaat Digital</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Online Flipbook</title>
+
     <style>
         :root {
-            --bg-color: #e0e5ec;
-            --primary-color: #3b82f6;
-            --text-color: #333;
+            --bg-color: #2c3e50;
+            --paper-color: #fdfbf7;
+            --shadow-strength: 0.4;
         }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
             background-color: var(--bg-color);
+            background-image: radial-gradient(circle at center, #34495e 0%, #2c3e50 100%);
             height: 100vh;
-            width: 100vw;
-            overflow: hidden; /* Mencegah scroll body double */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: sans-serif;
+            overflow: hidden; /* Mencegah scroll browser asli */
+        }
+
+        /* Loading Overlay */
+        #loading {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--bg-color);
             display: flex;
             flex-direction: column;
+            justify-content: center;
             align-items: center;
+            z-index: 9999;
+            color: white;
+            transition: opacity 0.5s;
         }
 
-        /* Area Utama */
-        .container {
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top: 5px solid #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Container Buku */
+        .book-container {
             position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            transition: transform 0.3s ease;
+        }
+
+        #flipbook {
+            display: none; /* Akan di-show via JS */
+        }
+
+        /* Styling Halaman (Page) */
+        .page {
+            background-color: var(--paper-color);
+            overflow: hidden;
+            /* Efek Kertas Realistis */
+            border-left: 1px solid rgba(0,0,0,0.1); 
+        }
+
+        /* Shadow dalam halaman agar tidak terlalu putih polos */
+        .page-wrapper {
             width: 100%;
             height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
+            background: linear-gradient(to right, rgba(0,0,0,0.05) 0%, rgba(255,255,255,0) 10%, rgba(255,255,255,0) 90%, rgba(0,0,0,0.05) 100%);
         }
 
-        #book-viewport {
-            width: 100%;
-            height: 90%; /* Sisakan ruang untuk kontrol bawah */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Container Buku - Ukurannya akan diatur oleh JavaScript */
-        #book {
-            /* Penting: Transform-style untuk 3D flip */
-            transform-style: preserve-3d;
-            position: relative;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-            transition: width 0.3s ease, height 0.3s ease;
-        }
-
-        .my-page {
-            background-color: #fff;
-            overflow: hidden;
-            border: 1px solid #eee; 
-        }
-
-        /* Kover Hard Cover */
-        .my-page[data-density="hard"] {
-            background-color: #fdfdfd;
-            border: 1px solid #ccc;
-        }
-
-        canvas {
+        .page img {
             width: 100%;
             height: 100%;
+            object-fit: cover; /* Mengisi halaman penuh */
             display: block;
         }
 
-        /* Navigasi */
-        .nav-side {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 45px;
-            height: 45px;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            color: #333;
-            transition: all 0.2s;
-            user-select: none;
+        /* Shadow dinamis saat membalik halaman (Turn.js classes) */
+        .page.shadow {
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.1);
         }
 
-        .nav-side:hover { background: var(--primary-color); color: white; }
-        .nav-left { left: 15px; }
-        .nav-right { right: 15px; }
-
-        /* Kontrol Bawah */
-        .controls-bar {
-            height: 10%;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255,255,255,0.8);
+        /* Controls Navigasi */
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(5px);
-            border-top: 1px solid #ccc;
-            z-index: 50;
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
         }
 
-        .page-badge {
-            font-weight: 500;
-            color: #555;
+        .controls.active {
+            opacity: 1;
+            pointer-events: all;
         }
 
-        /* Loading */
-        #loading-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #fff; z-index: 9999;
-            display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
-        }
-        
-        .spinner {
-            width: 40px; height: 40px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--primary-color);
+        .btn {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            transition: background 0.2s;
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+        .btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* Pesan Error */
+        #error-msg {
+            display: none;
+            text-align: center;
+            color: #ff6b6b;
+            padding: 20px;
+            max-width: 400px;
+        }
     </style>
 </head>
 <body>
 
-<!-- Loading -->
-<div id="loading-overlay">
-    <div class="spinner"></div>
-    <div style="margin-top:15px; color:#555;" id="loadingText">Memuat PDF...</div>
-    <div style="margin-top:5px; font-size:12px; color:#888;" id="progressText">0%</div>
-</div>
-
-<div class="container">
-    <!-- Nav -->
-    <div class="nav-side nav-left" id="prevBtn">&#10094;</div>
-    
-    <!-- Viewport Buku -->
-    <div id="book-viewport">
-        <!-- Elemen #book akan diisi canvas oleh JS -->
-        <div id="book"></div>
+    <!-- Loading Screen -->
+    <div id="loading">
+        <div class="spinner"></div>
+        <div id="loading-text">Memuat Buku...</div>
     </div>
-    
-    <div class="nav-side nav-right" id="nextBtn">&#10095;</div>
-</div>
 
-<!-- Footer Info -->
-<div class="controls-bar">
-    <div class="page-badge">
-        Halaman <span id="pageInfo">0</span> / <span id="pageTotal">--</span>
+    <!-- Error Message -->
+    <div id="error-msg">
+        <h3>File Tidak Ditemukan</h3>
+        <p>Pastikan Anda memiliki file bernama <strong>WARTA JEMAAT GKI GMM EDISI 16 Tahun ke-22 (04-01-2026)</strong> di folder ini.</p>
     </div>
-</div>
 
-<!-- Libraries -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-<script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';</script>
-<script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.js"></script>
+    <!-- Area Buku -->
+    <div class="book-container">
+        <div id="flipbook">
+            <!-- Halaman akan digenerate otomatis -->
+        </div>
+    </div>
 
-<script>
-    // --- KONFIGURASI ---
-    // Gunakan URL ini untuk demo. Ganti ke file lokal Anda nanti.
-    const currentPdfPath = 'WARTA JEMAAT GKI GMM EDISI 14 Tahun ke-22 (21-12-2025).pdf'; 
-    
-    // State
-    let flipObject = null;
-    let pdfDoc = null;
-    let pdfRendered = false; // Flag agar tidak render ulang saat resize
-    
-    const elBook = document.getElementById('book');
-    const pageInfo = document.getElementById('pageInfo');
-    const pageTotal = document.getElementById('pageTotal');
-    const loadingOverlay = document.getElementById('loading-overlay');
-    const loadingText = document.getElementById('loadingText');
-    const progressText = document.getElementById('progressText');
+    <!-- Tombol Navigasi -->
+    <div class="controls" id="controls">
+        <button class="btn" onclick="prevPage()">&#10094;</button>
+        <button class="btn" onclick="nextPage()">&#10095;</button>
+    </div>
 
-    // 1. Inisialisasi Aplikasi
-    async function initApp() {
-        try {
-            const loadingTask = pdfjsLib.getDocument(currentPdfPath);
-            pdfDoc = await loadingTask.promise;
-            pageTotal.innerText = pdfDoc.numPages;
+    <!-- Libraries -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/3/turn.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
-            // RENDER PDF HANYA SEKALI
-            await renderPdfToHtml();
-            
-            // Setup Ukuran & Flipbook Pertama Kali
-            setupBookSizeAndFlipbook();
-
-            // Hilangkan Loading
-            loadingOverlay.style.opacity = 0;
-            setTimeout(() => loadingOverlay.style.display = 'none', 500);
-
-        } catch (err) {
-            console.error(err);
-            loadingText.innerText = "Error: Gagal muat PDF.";
-            loadingText.style.color = "red";
-        }
-    }
-
-    // 2. Render PDF menjadi Canvas (Hanya sekali di awal)
-    async function renderPdfToHtml() {
-        elBook.innerHTML = ''; // Bersihkan
-        const fragment = document.createDocumentFragment();
-
-        // Ambil halaman 1 untuk ambil rasio asli
-        const firstPage = await pdfDoc.getPage(1);
-        const viewport = firstPage.getViewport({ scale: 1.0 });
+    <script>
+        // --- KONFIGURASI ---
+        const PDF_FILENAME = 'WARTA JEMAAT GKI GMM EDISI 16 Tahun ke-22 (04-01-2026)'; // Nama file PDF Anda
+        const BASE_WIDTH_DESKTOP = 900; // Lebar total buku di desktop (2 halaman)
+        const BASE_WIDTH_MOBILE = 100;  // Lebar persentase layar di mobile
+        const SCALE_QUALITY = 1.5;      // Kualitas render gambar (1.5 = retina ready)
         
-        // Simpan rasio asli (A4 biasanya ~1.414)
-        window.aspectRatio = viewport.width / viewport.height; 
-        window.baseRatio = { w: viewport.width, h: viewport.height };
+        // --- STATE ---
+        let pdfDoc = null;
+        let bookWidth = 0;
+        let bookHeight = 0;
+        let isMobile = window.innerWidth <= 768;
 
-        for (let i = 1; i <= pdfDoc.numPages; i++) {
-            // Update Loading Text
-            progressText.innerText = Math.round((i / pdfDoc.numPages) * 100) + '%';
+        // Setup Worker PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-            const page = await pdfDoc.getPage(i);
-            // Scale tinggi untuk kualitas tajam
-            const v = page.getViewport({ scale: 2.0 });
+        $(document).ready(async function() {
+            await loadPdf();
+        });
 
-            const div = document.createElement('div');
-            div.className = 'my-page';
+        // Fungsi Utama Load PDF
+        async function loadPdf() {
+            try {
+                // Coba ambil file WARTA JEMAAT GKI GMM EDISI 16 Tahun ke-22 (04-01-2026)
+                const loadingTask = pdfjsLib.getDocument(PDF_FILENAME);
+                pdfDoc = await loadingTask.promise;
+                
+                updateLoadingText(`Menemukan ${pdfDoc.numPages} halaman. Merender...`);
+                
+                // Render semua halaman ke dalam DOM
+                await renderAllPages(pdfDoc);
+                
+                // Setup Buku setelah halaman siap
+                setupBook();
+                
+                // Sembunyikan loading, tampilkan kontrol
+                $('#loading').fadeOut();
+                $('#controls').addClass('active');
+
+            } catch (error) {
+                console.error(error);
+                $('#loading').hide();
+                $('#error-msg').show();
+            }
+        }
+
+        // Render Halaman
+        async function renderAllPages(pdf) {
+            const flipbook = $('#flipbook');
+            flipbook.empty(); // Bersihkan
             
-            // Set density (Penting untuk library)
-            if (i === 1 || i === pdfDoc.numPages) {
-                div.dataset.density = 'hard';
+            // Kita ambil halaman 1 dulu untuk mengetahui aspect ratio
+            const page1 = await pdf.getPage(1);
+            const viewport = page1.getViewport({ scale: SCALE_QUALITY });
+            
+            // Hitung rasio (tinggi / lebar)
+            const aspectRatio = viewport.height / viewport.width;
+
+            // Tentukan ukuran dasar
+            if (isMobile) {
+                // Di mobile: lebar hampir fullscreen, tinggi menyesuaikan
+                bookWidth = window.innerWidth - 20; 
+                bookHeight = bookWidth * aspectRatio;
             } else {
-                div.dataset.density = 'soft';
+                // Di desktop: lebar fix (misal 900px), tinggi menyesuaikan
+                bookWidth = BASE_WIDTH_DESKTOP;
+                bookHeight = bookWidth * (aspectRatio / 2); // Karena 2 halaman jadi satu
             }
 
-            const canvas = document.createElement('canvas');
-            canvas.width = v.width;
-            canvas.height = v.height;
+            // Loop render semua halaman
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                
+                // Canvas sementara untuk render
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                
+                // Jika mobile, scale harus disesuaikan agar tajam di lebar layar
+                // Jika desktop, scale disesuaikan dengan setengah lebar buku
+                const pageRenderWidth = isMobile ? bookWidth * SCALE_QUALITY : (bookWidth / 2) * SCALE_QUALITY;
+                const newViewport = page.getViewport({ scale: SCALE_QUALITY * (pageRenderWidth / viewport.width) });
 
-            await page.render({ canvasContext: canvas.getContext('2d'), viewport: v }).promise;
-            
-            div.appendChild(canvas);
-            fragment.appendChild(div);
-        }
-        elBook.appendChild(fragment);
-        pdfRendered = true;
-    }
+                canvas.height = newViewport.height;
+                canvas.width = newViewport.width;
 
-    // 3. Hitung Ukuran Buku (Responsive Logic)
-    function calculateBookSize() {
-        const viewportW = window.innerWidth;
-        const viewportH = window.innerHeight;
-        const isMobile = viewportW < 768; // Batas tablet/desktop
-
-        let width, height;
-
-        if (isMobile) {
-            // Mode Portrait (HP): Tampilkan 1 Halaman penuh
-            // Lebar buku = lebar layar - padding
-            width = viewportW * 0.95; 
-            // Tinggi = lebar / rasio (misal A4)
-            height = width / window.aspectRatio;
-            
-            // Cek jika tinggi melebihi layar
-            if (height > viewportH * 0.85) {
-                height = viewportH * 0.85;
-                width = height * window.aspectRatio;
-            }
-        } else {
-            // Mode Landscape (PC/Tablet): Tampilkan 2 Halaman (Spread)
-            // Tinggi buku = tinggi layar - padding
-            height = viewportH * 0.8;
-            // Lebar total (2 halaman) = (tinggi / rasio) * 2
-            width = (height / window.aspectRatio) * 2;
-
-            // Batasi lebar jika terlalu melebar
-            if (width > viewportW * 0.9) {
-                width = viewportW * 0.9;
-                height = (width / 2) * window.aspectRatio;
+                await page.render({ canvasContext: context, viewport: newViewport }).promise;
+                
+                const imgData = canvas.toDataURL('image/jpeg', 0.9);
+                
+                // Buat elemen HTML
+                const div = document.createElement('div');
+                div.className = 'page';
+                div.style.width = isMobile ? bookWidth + 'px' : (bookWidth / 2) + 'px';
+                div.style.height = bookHeight + 'px';
+                
+                const img = document.createElement('img');
+                img.src = imgData;
+                
+                div.appendChild(img);
+                flipbook.append(div);
+                
+                updateLoadingText(`Merender halaman ${i}/${pdf.numPages}...`);
             }
         }
 
-        return { width, height, isMobile };
-    }
+        // Setup Turn.js
+        function setupBook() {
+            const flipbook = $('#flipbook');
+            
+            // Hapus instance lama jika ada
+            if (flipbook.data('turn')) {
+                flipbook.turn("destroy");
+            }
 
-    // 4. Setup Flipbook (Init & Re-Init)
-    function setupBookSizeAndFlipbook() {
-        if (!pdfRendered) return;
+            flipbook.turn({
+                width: bookWidth,
+                height: bookHeight,
+                autoCenter: true,
+                duration: 1200,       // Lebih lambat = lebih elegan
+                acceleration: true,   // Percepatan di akhir flip
+                gradients: true,      // Efek shading saat berbalik
+                elevation: 50,        // Ketinggian saat mencengkeram kertas
+                when: {
+                    turning: function(e, page, view) {
+                        // Logika tambahan saat balik halaman
+                    }
+                }
+            });
 
-        const { width, height, isMobile } = calculateBookSize();
-
-        // 1. Set Ukuran CSS Container #book
-        // Ini penting agar library tahu area kerjanya
-        elBook.style.width = `${width}px`;
-        elBook.style.height = `${height}px`;
-
-        // 2. Simpan halaman saat ini (jika ada instance lama)
-        let currentIndex = 0;
-        if (flipObject) {
-            currentIndex = flipObject.getCurrentPageIndex();
-            flipObject.destroy(); // Hancurkan instance lama bersih-bersih
+            // Tentukan tampilan single/double
+            if (isMobile) {
+                flipbook.turn("display", "single");
+            } else {
+                flipbook.turn("display", "double");
+            }
         }
 
-        // 3. Buat Instance Baru
-        flipObject = new St.PageFlip(elBook, {
-            width: width, // Base width (akan di-stretch)
-            height: height, // Base height (akan di-stretch)
-            size: "stretch", // Memaksa canvas menyesuaikan div container
-            
-            mode: isMobile ? "portrait" : "double", // Ganti mode otomatis
-            showCover: true,
-            mobileScrollSupport: true,
-            maxShadowOpacity: 0.3,
-            
-            // Mulai dari halaman tersimpan sebelumnya (agar tidak reset saat zoom)
-            startPage: currentIndex
+        // Update Loading Text
+        function updateLoadingText(msg) {
+            $('#loading-text').text(msg);
+        }
+
+        // Navigasi
+        window.prevPage = function() {
+            $("#flipbook").turn("previous");
+        }
+        window.nextPage = function() {
+            $("#flipbook").turn("next");
+        }
+
+        // Handle Resize (Responsive Switching)
+        let resizeTimeout;
+        $(window).resize(function() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(handleResize, 300);
         });
 
-        // Load dari Elemen HTML yang SUDAH ADA (Tidak render ulang)
-        flipObject.loadFromHTML(document.querySelectorAll('.my-page'));
-
-        // Event Update Info Halaman
-        flipObject.on('flip', (e) => {
-            pageInfo.innerText = e.data + 1;
-        });
-    }
-
-    // --- EVENT LISTENERS ---
-
-    // Tombol Navigasi
-    document.getElementById('prevBtn').onclick = () => { if(flipObject) flipObject.flipPrev(); };
-    document.getElementById('nextBtn').onclick = () => { if(flipObject) flipObject.flipNext(); };
-
-    // Resize & Zoom Handler (Debounced)
-    let resizeTimer;
-    window.addEventListener('resize', () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => {
-            // Saat user zoom in/out, window.innerWidth berubah.
-            // Kita panggil setup ulang. Karena pdfRendered = true, 
-            // PDF tidak di-load ulang, hanya ukuran & mode flipbook yang disesuaikan.
-            setupBookSizeAndFlipbook();
-        }, 300);
-    });
-
-    // Mulai
-    initApp();
-
-</script>
+        function handleResize() {
+            const newIsMobile = window.innerWidth <= 768;
+            
+            // Jika status berubah (Mobile -> Desktop atau sebaliknya)
+            if (newIsMobile !== isMobile) {
+                isMobile = newIsMobile;
+                // Kita perlu reload halaman untuk mengubah ukuran render secara bersih
+                // Atau kita bisa coba resize turn.js, tapi render ulang lebih aman untuk resolusi gambar.
+                location.reload(); 
+            } else {
+                // Jika hanya sedikit perubahan ukuran di mode yang sama, centering ulang saja
+                $("#flipbook").turn("center");
+            }
+        }
+    </script>
 </body>
 </html>
