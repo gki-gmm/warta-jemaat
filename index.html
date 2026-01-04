@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Protected Flipbook</title>
+    <title>Warta Jemaat Online</title>
     
+    <!-- Favicon dummy -->
     <link rel="icon" href="data:,">
 
     <style>
         :root {
-            --bg-color: #2c3e50;
+            --bg-color: #ffffff;
             --paper-color: #fdfbf7;
         }
 
@@ -17,7 +18,7 @@
             margin: 0;
             padding: 0;
             background-color: var(--bg-color);
-            background-image: radial-gradient(circle at center, #34495e 0%, #2c3e50 100%);
+            background-image: radial-gradient(circle at center, #f3f9ff 0%, #eff6fd 100%);
             height: 100vh;
             display: flex;
             justify-content: center;
@@ -26,88 +27,18 @@
             overflow: hidden;
         }
 
-        /* --- PASSWORD MODAL STYLE --- */
-        #password-modal {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.9);
-            z-index: 10000;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-        }
-
-        .modal-box {
-            background: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            text-align: center;
-            color: #333;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        .modal-box h2 { margin-top: 0; }
-
-        #pass-input {
-            width: 80%;
-            padding: 10px;
-            margin: 15px 0;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-            text-align: center;
-        }
-
-        #pass-btn {
-            padding: 10px 25px;
-            background: #2c3e50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background 0.3s;
-        }
-
-        #pass-btn:hover { background: #34495e; }
-
-        #error-msg {
-            color: red;
-            font-size: 14px;
-            margin-top: 10px;
-            display: none;
-        }
-
-        /* Animasi goyang jika password salah */
-        .shake {
-            animation: shake 0.5s;
-        }
-
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            50% { transform: translateX(10px); }
-            75% { transform: translateX(-10px); }
-            100% { transform: translateX(0); }
-        }
-
-        /* --- END PASSWORD STYLE --- */
-
-        /* Loading Screen (Muncul setelah password benar) */
+        /* Loading Overlay */
         #loading {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
             background: var(--bg-color);
-            display: none; /* Disembunyikan dulu sampai password benar */
+            display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 9998;
+            z-index: 9999;
             color: white;
+            transition: opacity 0.5s;
         }
 
         .spinner {
@@ -126,13 +57,10 @@
         .book-container {
             position: relative;
             box-shadow: 0 25px 60px rgba(0,0,0,0.6);
-            /* Pastikan user bisa men-select teks jika ada, tapi untuk buku gambar biasanya tidak perlu */
-            user-select: none; 
         }
 
         #flipbook {
             display: none; /* Disembunyikan sampai gambar siap */
-            cursor: pointer; /* Indikasi bisa diklik */
         }
 
         /* Styling Halaman */
@@ -146,64 +74,107 @@
             height: 100%;
             object-fit: contain; /* Agar gambar tidak gepeng */
             display: block;
-            pointer-events: none; /* Mencegah drag & drop gambar browser asli */
         }
 
         /* Shadow effect untuk kedalaman */
         .page {
             box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
         }
+
+        /* Controls Navigasi */
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+        }
+
+        .controls.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .btn {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: white;
+            color: #333;
+        }
+
+        /* Pesan Error jika gambar tidak ketemu */
+        #error-msg {
+            display: none;
+            color: #ff6b6b;
+            background: rgba(0,0,0,0.8);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 
-    <!-- 1. MODAL PASSWORD (Muncul paling awal) -->
-    <div id="password-modal">
-        <div class="modal-box">
-            <h2>Akses Terbatas</h2>
-            <p>Masukkan password untuk membuka buku.</p>
-            <input type="password" id="pass-input" placeholder="Password..." onkeypress="handleEnter(event)">
-            <br>
-            <button id="pass-btn" onclick="checkPassword()">Buka Buku</button>
-            <div id="error-msg">Password salah!</div>
-        </div>
-    </div>
-
-    <!-- 2. LOADING SCREEN (Muncul setelah password benar) -->
+    <!-- Loading Screen -->
     <div id="loading">
         <div class="spinner"></div>
         <div id="loading-text">Memuat Buku...</div>
     </div>
 
-    <!-- 3. ERROR JIKA GAMBAR HILANG -->
-    <div id="img-error-msg" style="display:none; position:absolute; color:white; text-align:center;">
+    <!-- Error Message -->
+    <div id="error-msg">
         <h3>Gagal Memuat</h3>
-        <p>Pastikan folder 'img' ada dan berisi gambar.</p>
+        <p>Pastikan folder <strong>img</strong> ada dan berisi gambar bernama 1.jpg, 2.jpg, dst.</p>
     </div>
 
-    <!-- 4. AREA BUKU -->
+    <!-- Area Buku -->
     <div class="book-container">
         <div id="flipbook">
-            <!-- Halaman akan di-generate otomatis -->
+            <!-- Halaman akan di-generate otomatis via JS -->
         </div>
     </div>
 
-    <!-- LIBRARIES -->
+    <!-- Tombol Navigasi -->
+    <div class="controls" id="controls">
+        <button class="btn" onclick="prevPage()">&#10094;</button>
+        <button class="btn" onclick="nextPage()">&#10095;</button>
+    </div>
+
+    <!-- Libraries (jQuery & Turn.js) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/3/turn.min.js"></script>
-    <!-- Library tambahan untuk fitur SWIPE (Usap) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-touchswipe/1.6.19/jquery.touchSwipe.min.js"></script>
 
     <script>
         // ==========================================
-        // KONFIGURASI
+        // PENGATURAN (Sesuaikan di sini)
         // ==========================================
         const CONFIG = {
-            folderName: 'img',
-            totalImages: 25,         // Sesuaikan jumlah gambar Anda (1.jpg sampai 25.jpg)
-            fileExtension: '.jpg',
-            baseWidth: 900,
-            password: '150903'         // GANTI PASSWORD ANDA DI SINI
+            folderName: 'img',      // Nama folder gambar Anda
+            totalImages: 25,        // JUMLAH TOTAL GAMBAR (Ubah angka ini!)
+            fileExtension: '.jpg',  // Format gambar (.jpg atau .png)
+            baseWidth: 900          // Lebar dasar buku di desktop
         };
 
         // ==========================================
@@ -214,57 +185,33 @@
         let bookHeight = 0;
         let isMobile = window.innerWidth <= 768;
 
-        // Fungsi Cek Password
-        function checkPassword() {
-            const input = $('#pass-input').val();
-            const errorMsg = $('#error-msg');
-            const modalBox = $('.modal-box');
+        $(document).ready(function() {
+            initBook();
+        });
 
-            if (input === CONFIG.password) {
-                // Password Benar
-                $('#password-modal').fadeOut(300, function() {
-                    // Mulai proses loading buku
-                    $('#loading').show();
-                    initBook();
-                });
-            } else {
-                // Password Salah
-                errorMsg.show();
-                modalBox.addClass('shake');
-                setTimeout(() => {
-                    modalBox.removeClass('shake');
-                }, 500);
-            }
-        }
-
-        // Handle Enter key pada input password
-        function handleEnter(e) {
-            if (e.key === 'Enter') {
-                checkPassword();
-            }
-        }
-
-        // Inisialisasi Buku (Dipanggil setelah password benar)
         function initBook() {
             const flipbook = $('#flipbook');
             const loadingText = $('#loading-text');
 
-            // 1. Preload Gambar Pertama untuk mengetahui Aspek Rasio
+            // 1. Preload Gambar Pertama untuk mengetahui Aspek Rasio (Tinggi/Lebar)
             const firstImgPath = `${CONFIG.folderName}/1${CONFIG.fileExtension}`;
             const tempImg = new Image();
             
             tempImg.src = firstImgPath;
             
             tempImg.onload = function() {
+                // Hitung rasio berdasarkan gambar asli
                 const aspectRatio = this.naturalHeight / this.naturalWidth;
 
                 // Tentukan Ukuran Buku
                 if (isMobile) {
+                    // Mobile: Lebar mengikuti layar - padding
                     bookWidth = window.innerWidth - 30; 
                     bookHeight = bookWidth * aspectRatio;
                 } else {
+                    // Desktop: Lebar fix sesuai config, tinggi menyesuaikan
                     bookWidth = CONFIG.baseWidth;
-                    bookHeight = bookWidth * (aspectRatio / 2);
+                    bookHeight = bookWidth * (aspectRatio / 2); // Dibagi 2 karena 2 halaman
                 }
 
                 // 2. Generate Halaman ke DOM
@@ -276,11 +223,12 @@
                 // 4. Tampilkan Buku & Sembunyikan Loading
                 flipbook.show();
                 $('#loading').fadeOut();
+                $('#controls').addClass('active');
             };
 
             tempImg.onerror = function() {
                 $('#loading').hide();
-                $('#img-error-msg').show();
+                $('#error-msg').show();
                 console.error("Gagal memuat gambar pertama: " + firstImgPath);
             };
         }
@@ -290,21 +238,25 @@
             const loadingText = $('#loading-text');
             flipbook.empty();
 
+            // Loop dari 1 sampai totalImages
             for (let i = 1; i <= CONFIG.totalImages; i++) {
                 const imgPath = `${CONFIG.folderName}/${i}${CONFIG.fileExtension}`;
                 
+                // Buat elemen div page
                 const pageDiv = document.createElement('div');
                 pageDiv.className = 'page';
                 
+                // Set ukuran halaman
                 const pageWidth = isMobile ? bookWidth : (bookWidth / 2);
                 pageDiv.style.width = pageWidth + 'px';
                 pageDiv.style.height = bookHeight + 'px';
 
+                // Buat elemen gambar
                 const img = document.createElement('img');
                 img.src = imgPath;
                 img.alt = `Halaman ${i}`;
-                img.loading = "lazy"; // Lazy load untuk performa lebih baik
                 
+                // Event untuk update loading text
                 img.onload = function() {
                     loadingText.text(`Memuat Halaman ${i}/${CONFIG.totalImages}...`);
                 };
@@ -331,26 +283,18 @@
                 display: isMobile ? "single" : "double",
                 when: {
                     turning: function(e, page, view) {
-                        // Log tambahan jika diperlukan
+                        // Optional: Log saat berpindah
                     }
                 }
             });
+        }
 
-            // --- TAMBAHAN: FITUR SWIPE (USAP) ---
-            // Menggunakan library jQuery TouchSwipe
-            flipbook.swipe({
-                swipeLeft: function(event, direction, distance, duration, fingerCount) {
-                    // Usap ke kiri = Halaman Selanjutnya (Next)
-                    $(this).turn("next");
-                },
-                swipeRight: function(event, direction, distance, duration, fingerCount) {
-                    // Usap ke kanan = Halaman Sebelumnya (Prev)
-                    $(this).turn("previous");
-                },
-                // Konfigurasi agar tidak bentrok dengan klik mouse
-                threshold: 50, // Minimal jarak usap (pixel)
-                fingers: 'all'
-            });
+        // Fungsi Navigasi
+        window.prevPage = function() {
+            $("#flipbook").turn("previous");
+        }
+        window.nextPage = function() {
+            $("#flipbook").turn("next");
         }
 
         // Handle Window Resize
@@ -358,8 +302,8 @@
         $(window).resize(function() {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(function() {
+                // Jika mode berubah (Mobile <-> Desktop), reload halaman
                 const newIsMobile = window.innerWidth <= 768;
-                // Reload hanya jika mode berubah drastis
                 if (newIsMobile !== isMobile) {
                     location.reload(); 
                 }
