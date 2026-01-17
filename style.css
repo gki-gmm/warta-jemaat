@@ -139,7 +139,7 @@ input {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    background-color: rgba(180, 160, 255, 0.356);
+    background-color: rgba(180, 160, 255, 0.356) url(./assets/images/page/cover1.webp);;
     box-shadow: 0 0 5px 0 rgb(25, 25, 25, 0.25);
 }
 
