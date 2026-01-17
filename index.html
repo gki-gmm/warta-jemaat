@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Flip Book</title>
+    <title>Warta Jemaat GKI Griya Merpati Mas</title>
 
     <link rel="stylesheet" href="./style.css">
 
@@ -16,6 +16,9 @@
 
 <body>
     <main>
+        <audio id="page-flip-sound" preload="auto">
+            <source src="assets/images/audio/mixkit-page-turn-single-1104.wav" type="audio/mpeg">
+        </audio>
         <input type="checkbox" id="cover_checkbox">
         <input type="checkbox" id="page1_checkbox">
         <input type="checkbox" id="page2_checkbox">
@@ -26,30 +29,37 @@
         <input type="checkbox" id="page7_checkbox">
 
         <div id="flip_book">
-            
+
             <div class="front_cover">
-                <div class="front_page" style="width: 100%; height: 100%; border-radius: 2.5px 5px 5px 2.5px; overflow: hidden;">
+                <div class="front_page"
+                    style="width: 100%; height: 100%; border-radius: 2.5px 5px 5px 2.5px; overflow: hidden;">
                     <label for="cover_checkbox" id="cover"></label>
-                    <img src="./assets/images/pages/cover1.webp" alt="Front Cover" style="width: 100%; height: 100%; object-fit: cover;">
+                    <img src="./assets/images/pages/cover1.webp" alt="Front Cover"
+                        style="width: 100%; height: 100%; object-fit: cover;">
                 </div>
 
-                <div class="back_page" style="width: 100%; height: 100%; border-radius: 5px 0 0 5px; overflow: hidden; left: 0;">
-                    <label for="cover_checkbox"></label> 
-                    <img class="edge_shading" src="./assets/images/back_page_edge_shading.webp" alt="Back page edge shading" style="width: 100%; height: 100%; left: 0;">
-                    <img class="back_content" src="./assets/images/pages/cover2.webp" alt="Inside Front Cover" style="width: 100%; height: 100%; left: 0; border-radius: 5px 0 0 5px;">
+                <div class="back_page"
+                    style="width: 100%; height: 100%; border-radius: 5px 0 0 5px; overflow: hidden; left: 0;">
+                    <label for="cover_checkbox"></label>
+                    <img class="edge_shading" src="./assets/images/back_page_edge_shading.webp"
+                        alt="Back page edge shading" style="width: 100%; height: 100%; left: 0;">
+                    <img class="back_content" src="./assets/images/pages/cover2.webp" alt="Inside Front Cover"
+                        style="width: 100%; height: 100%; left: 0; border-radius: 5px 0 0 5px;">
                 </div>
             </div>
 
             <div class="page" id="page1">
                 <div class="front_page">
                     <label for="page1_checkbox"></label>
-                    <img class="edge_shading" src="./assets/images/front_page_edge_shading.webp" alt="Front page edge shading">
+                    <img class="edge_shading" src="./assets/images/front_page_edge_shading.webp"
+                        alt="Front page edge shading">
                     <img class="front_content" src="./assets/images/pages/page1.webp" alt="Front content">
                 </div>
 
                 <div class="back_page">
                     <label for="page1_checkbox"></label>
-                    <img class="edge_shading" src="./assets/images/back_page_edge_shading.webp" alt="Back page edge shading">
+                    <img class="edge_shading" src="./assets/images/back_page_edge_shading.webp"
+                        alt="Back page edge shading">
                     <img class="back_content" src="./assets/images/pages/page2.webp" alt="Back content">
                 </div>
             </div>
@@ -57,13 +67,15 @@
             <div class="page" id="page2">
                 <div class="front_page">
                     <label for="page2_checkbox"></label>
-                    <img class="edge_shading" src="./assets/images/front_page_edge_shading.webp" alt="Front page edge shading">
+                    <img class="edge_shading" src="./assets/images/front_page_edge_shading.webp"
+                        alt="Front page edge shading">
                     <img class="front_content" src="./assets/images/pages/page3.webp" alt="Front content">
                 </div>
 
                 <div class="back_page">
                     <label for="page2_checkbox"></label>
-                    <img class="edge_shading" src="./assets/images/back_page_edge_shading.webp" alt="Back page edge shading">
+                    <img class="edge_shading" src="./assets/images/back_page_edge_shading.webp"
+                        alt="Back page edge shading">
                     <img class="back_content" src="./assets/images/pages/page4.webp" alt="Back content">
                 </div>
             </div>
@@ -71,13 +83,15 @@
             <div class="page" id="page3">
                 <div class="front_page">
                     <label for="page3_checkbox"></label>
-                    <img class="edge_shading" src="./assets/images/front_page_edge_shading.webp" alt="Front page edge shading">
+                    <img class="edge_shading" src="./assets/images/front_page_edge_shading.webp"
+                        alt="Front page edge shading">
                     <img class="front_content" src="./assets/images/pages/page5.webp" alt="Front content">
                 </div>
 
                 <div class="back_page">
                     <label for="page3_checkbox"></label>
-                    <img class="edge_shading" src="./assets/images/back_page_edge_shading.webp" alt="Back page edge shading">
+                    <img class="edge_shading" src="./assets/images/back_page_edge_shading.webp"
+                        alt="Back page edge shading">
                     <img class="back_content" src="./assets/images/pages/page6.webp" alt="Back content">
                 </div>
             </div>
@@ -85,13 +99,15 @@
             <div class="page" id="page4">
                 <div class="front_page">
                     <label for="page4_checkbox"></label>
-                    <img class="edge_shading" src="./assets/images/front_page_edge_shading.webp" alt="Front page edge shading">
+                    <img class="edge_shading" src="./assets/images/front_page_edge_shading.webp"
+                        alt="Front page edge shading">
                     <img class="front_content" src="./assets/images/pages/page7.webp" alt="Front content">
                 </div>
 
                 <div class="back_page">
                     <label for="page4_checkbox"></label>
-                    <img class="edge_shading" src="./assets/images/back_page_edge_shading.webp" alt="Back page edge shading">
+                    <img class="edge_shading" src="./assets/images/back_page_edge_shading.webp"
+                        alt="Back page edge shading">
                     <img class="back_content" src="./assets/images/pages/page8.webp" alt="Back content">
                 </div>
             </div>
@@ -99,13 +115,15 @@
             <div class="page" id="page5">
                 <div class="front_page">
                     <label for="page5_checkbox"></label>
-                    <img class="edge_shading" src="./assets/images/front_page_edge_shading.webp" alt="Front page edge shading">
+                    <img class="edge_shading" src="./assets/images/front_page_edge_shading.webp"
+                        alt="Front page edge shading">
                     <img class="front_content" src="./assets/images/pages/page9.webp" alt="Front content">
                 </div>
 
                 <div class="back_page">
                     <label for="page5_checkbox"></label>
-                    <img class="edge_shading" src="./assets/images/back_page_edge_shading.webp" alt="Back page edge shading">
+                    <img class="edge_shading" src="./assets/images/back_page_edge_shading.webp"
+                        alt="Back page edge shading">
                     <img class="back_content" src="./assets/images/pages/page10.webp" alt="Back content">
                 </div>
             </div>
@@ -113,21 +131,24 @@
             <div class="page" id="page6">
                 <div class="front_page">
                     <label for="page6_checkbox"></label>
-                    <img class="edge_shading" src="./assets/images/front_page_edge_shading.webp" alt="Front page edge shading">
+                    <img class="edge_shading" src="./assets/images/front_page_edge_shading.webp"
+                        alt="Front page edge shading">
                     <img class="front_content" src="./assets/images/pages/page11.webp" alt="Front content">
                 </div>
 
                 <div class="back_page">
                     <label for="page6_checkbox"></label>
-                    <img class="edge_shading" src="./assets/images/back_page_edge_shading.webp" alt="Back page edge shading">
+                    <img class="edge_shading" src="./assets/images/back_page_edge_shading.webp"
+                        alt="Back page edge shading">
                     <img class="back_content" src="./assets/images/pages/page12.webp" alt="Back content">
                 </div>
             </div>
 
-             <div class="page" id="page7">
+            <div class="page" id="page7">
                 <div class="front_page">
                     <label for="page6_checkbox"></label>
-                    <img class="edge_shading" src="./assets/images/front_page_edge_shading.webp" alt="Front page edge shading">
+                    <img class="edge_shading" src="./assets/images/front_page_edge_shading.webp"
+                        alt="Front page edge shading">
                     <img class="front_content" src="./assets/images/pages/back2.webp" alt="End Page Content">
                 </div>
 
@@ -137,21 +158,22 @@
             </div>
 
             <div class="back_cover">
-                <img src="./assets/images/pages/back2.webp" alt="Back Cover" style="width: 100%; height: 100%; border-radius: 5px 0 0 5px; object-fit: cover;">
+                <img src="./assets/images/pages/back2.webp" alt="Back Cover"
+                    style="width: 100%; height: 100%; border-radius: 5px 0 0 5px; object-fit: cover;">
             </div>
-            
+
         </div>
 
         <button id="toggle-mode-btn">
             <i class="bi bi-moon-stars-fill"></i>
         </button>
     </main>
-    
+
     <div id="responsive-warning">
-         <div class="warning-icons">
+        <div class="warning-icons">
             <i class="bi bi-phone-landscape"></i>
-         </div>
-         <p>Please rotate your device to landscape or use a larger screen for the best experience.</p>
+        </div>
+        <p>Please rotate your device to landscape or use a larger screen for the best experience.</p>
     </div>
 </body>
 

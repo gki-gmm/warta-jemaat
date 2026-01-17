@@ -11,9 +11,10 @@
 :root {
     --dark-color: rgb(2, 4, 8);
     --dark-hover: rgba(255, 255, 255, 0.1);
-
     --light-color: rgb(245, 245, 245);
     --light-hover: rgba(0, 0, 0, 0.1);
+    --page-curve: 15px; /* Radius lengkungan kertas */
+    --shadow-intensity: 0.3; /* Intensitas bayangan */
 }
 
 /* GENERAL */
@@ -27,11 +28,12 @@ body {
     font-family: monospace, sans-serif;
     font-size: 0.5rem;
     transition: background-color 0.3s;
+    overflow: hidden;
 }
 
 body.light-mode {
     color: var(--dark-color);
-    background-color: var(--light-color)
+    background-color: var(--light-color);
 }
 
 body.light-mode #toggle-mode-btn:hover {
@@ -111,6 +113,23 @@ input {
     position: relative;
     transition-duration: 1s;
     perspective: 2000px;
+    transform-style: preserve-3d;
+}
+
+/* EFEK KERTAS MENDEKUK - KELAS BARU */
+.page-curve {
+    position: absolute;
+    width: 20px;
+    height: 100%;
+    background: linear-gradient(to right, 
+        rgba(0,0,0,0.1) 0%, 
+        rgba(0,0,0,0.05) 50%, 
+        transparent 100%);
+    z-index: 150;
+    pointer-events: none;
+    border-radius: 0 10px 10px 0;
+    opacity: 0;
+    transition: opacity 0.3s;
 }
 
 .front_cover,
@@ -123,26 +142,37 @@ input {
     align-items: center;
     border-radius: 2.5px 5px 5px 2.5px;
     background-color: rgba(180, 160, 255, 0.356);
-    box-shadow: 0 0 5px 0 rgb(25, 25, 25, 0.25);
-    /* PENTING: Ditambahkan agar anak elemennya (front_page/back_page) bisa 3D */
-    transform-style: preserve-3d; 
+    box-shadow: 0 0 5px 0 rgba(25, 25, 25, 0.25);
+    transform-style: preserve-3d;
+    transition: transform 0.8s cubic-bezier(0.42, 0, 0.58, 1);
 }
 
 .front_cover {
     position: absolute;
     cursor: pointer;
     transform-origin: center left;
-    transition: transform 0.5s;
     z-index: 99;
 }
 
-/* Style khusus untuk label di dalam struktur baru front_cover */
 .front_cover .front_page label {
     width: 100%;
     height: 100%;
     position: absolute;
     cursor: pointer;
     z-index: 10;
+}
+
+/* EFEK HALAMAN YANG SEDANG DIBALIK */
+.page.flipping {
+    z-index: 100 !important;
+}
+
+.page.flipping .front_page {
+    box-shadow: 
+        -5px 0 15px rgba(0,0,0,0.2),
+        inset -2px 0 5px rgba(0,0,0,0.1);
+    transform-origin: left center;
+    transition: transform 0.8s cubic-bezier(0.42, 0, 0.58, 1);
 }
 
 .page {
@@ -153,10 +183,17 @@ input {
     left: 1px;
     border-radius: 0 5px 5px 0;
     background-color: white;
-    transform-origin: left;
+    transform-origin: left center;
     transform-style: preserve-3d;
     transform: rotateY(0deg);
-    transition-duration: 0.5s;
+    transition: 
+        transform 0.8s cubic-bezier(0.42, 0, 0.58, 1),
+        z-index 0.1s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.page:hover {
+    cursor: pointer;
 }
 
 .front_page {
@@ -164,8 +201,9 @@ input {
     height: 100%;
     position: absolute;
     backface-visibility: hidden;
-    /* Ditambahkan agar warna background tidak tembus saat ada gambar */
-    background-color: white; 
+    background-color: white;
+    border-radius: 0 5px 5px 0;
+    overflow: hidden;
 }
 
 .front_page label {
@@ -183,8 +221,9 @@ input {
     backface-visibility: hidden;
     transform: rotateY(180deg);
     z-index: 100;
-     /* Ditambahkan agar warna background tidak tembus saat ada gambar */
     background-color: white;
+    border-radius: 5px 0 0 5px;
+    overflow: hidden;
 }
 
 .back_page label {
@@ -209,6 +248,7 @@ input {
     top: 1px;
     border-radius: 0 5px 5px 0;
     z-index: 97;
+    object-fit: cover;
 }
 
 .back_content {
@@ -219,204 +259,158 @@ input {
     left: 1px;
     border-radius: 5px 0 0 5px;
     z-index: 97;
+    object-fit: cover;
 }
 
 .back_cover {
     position: relative;
     z-index: -1;
     border-radius: 5px 0 0 5px;
-    /* Back cover tidak perlu preserve-3d karena dia statis di belakang */
-    transform-style: flat; 
+    transform-style: flat;
 }
 
 /* Z-Index untuk halaman */
 #page1 { z-index: 8; }
-#page2 { z-index: 7; } /* Disesuaikan */
-#page3 { z-index: 6; } /* Disesuaikan */
-#page4 { z-index: 5; } /* Disesuaikan */
-#page5 { z-index: 4; } /* Disesuaikan */
-#page6 { z-index: 3; } /* Disesuaikan */
-#page7 { z-index: 2; } /* Halaman baru */
+#page2 { z-index: 7; }
+#page3 { z-index: 6; }
+#page4 { z-index: 5; }
+#page5 { z-index: 4; }
+#page6 { z-index: 3; }
+#page7 { z-index: 2; }
 
-#cover_checkbox:checked~#flip_book {
-    transform: translateX(144px)
-}
-
-#cover_checkbox:checked~#flip_book .front_cover {
-    transform: rotateY(-180deg);
-    transition: transform 1.5s, z-index 0.5s 0.5s;
+/* Animasi untuk efek membalik dengan lengkungan */
+#cover_checkbox:checked ~ #flip_book .front_cover {
+    transform: rotateY(-180deg) scaleX(0.98);
+    box-shadow: 
+        -10px 0 20px rgba(0,0,0,0.3),
+        inset -5px 0 10px rgba(0,0,0,0.2);
     z-index: 1;
 }
 
-/* CSS ini tidak lagi diperlukan karena struktur HTML front_cover berubah */
-/* #cover_checkbox:checked~#flip_book #cover {
-    width: 80%;
-    height: 80%;
-    position: absolute;
-} */
+/* Efek lengkungan saat halaman dibalik */
+#page1_checkbox:checked ~ #flip_book #page1 { 
+    transform: rotateY(-180deg) scaleX(0.98); 
+    z-index: 9; 
+    box-shadow: 
+        -10px 0 20px rgba(0,0,0,0.2),
+        inset -3px 0 8px rgba(0,0,0,0.1);
+}
+#page2_checkbox:checked ~ #flip_book #page2 { 
+    transform: rotateY(-180deg) scaleX(0.98); 
+    z-index: 10; 
+    box-shadow: 
+        -10px 0 20px rgba(0,0,0,0.2),
+        inset -3px 0 8px rgba(0,0,0,0.1);
+}
+#page3_checkbox:checked ~ #flip_book #page3 { 
+    transform: rotateY(-180deg) scaleX(0.98); 
+    z-index: 11; 
+    box-shadow: 
+        -10px 0 20px rgba(0,0,0,0.2),
+        inset -3px 0 8px rgba(0,0,0,0.1);
+}
+#page4_checkbox:checked ~ #flip_book #page4 { 
+    transform: rotateY(-180deg) scaleX(0.98); 
+    z-index: 12; 
+    box-shadow: 
+        -10px 0 20px rgba(0,0,0,0.2),
+        inset -3px 0 8px rgba(0,0,0,0.1);
+}
+#page5_checkbox:checked ~ #flip_book #page5 { 
+    transform: rotateY(-180deg) scaleX(0.98); 
+    z-index: 13; 
+    box-shadow: 
+        -10px 0 20px rgba(0,0,0,0.2),
+        inset -3px 0 8px rgba(0,0,0,0.1);
+}
+#page6_checkbox:checked ~ #flip_book #page6 { 
+    transform: rotateY(-180deg) scaleX(0.98); 
+    z-index: 14; 
+    box-shadow: 
+        -10px 0 20px rgba(0,0,0,0.2),
+        inset -3px 0 8px rgba(0,0,0,0.1);
+}
+#page7_checkbox:checked ~ #flip_book #page7 { 
+    transform: rotateY(-180deg) scaleX(0.98); 
+    z-index: 15; 
+    box-shadow: 
+        -10px 0 20px rgba(0,0,0,0.2),
+        inset -3px 0 8px rgba(0,0,0,0.1);
+}
 
-/* Logika Z-Index saat halaman dibalik */
-#page1_checkbox:checked~#flip_book #page1 { transform: rotateY(-180deg); z-index: 2; }
-#page2_checkbox:checked~#flip_book #page2 { transform: rotateY(-180deg); z-index: 3; }
-#page3_checkbox:checked~#flip_book #page3 { transform: rotateY(-180deg); z-index: 4; }
-#page4_checkbox:checked~#flip_book #page4 { transform: rotateY(-180deg); z-index: 5; }
-#page5_checkbox:checked~#flip_book #page5 { transform: rotateY(-180deg); z-index: 6; }
-#page6_checkbox:checked~#flip_book #page6 { transform: rotateY(-180deg); z-index: 7; }
-#page7_checkbox:checked~#flip_book #page7 { transform: rotateY(-180deg); z-index: 8; }
-
-/* =========================================
-   RESPONSIVE MOBILE (Tambahan Baru)
-   ========================================= */
-
+/* RESPONSIVE MOBILE */
 @media (max-width: 768px) {
-    /* 1. Hilangkan peringatan karena kita akan buat responsive */
+    /* Hilangkan peringatan */
     #responsive-warning {
         display: none !important;
     }
 
-    /* 2. Atur body untuk mobile */
+    /* Atur ukuran untuk mobile */
     body {
-        padding: 20px 0;
+        padding: 10px 0;
         justify-content: flex-start;
         overflow-x: hidden;
     }
 
-    /* 3. Atur flip book untuk mobile */
     #flip_book {
         width: 90vw;
-        height: calc(90vw * 420 / 298); /* Pertahankan aspect ratio */
+        height: calc(90vw * 420 / 298);
         max-width: 400px;
         max-height: 560px;
         transform: none !important;
-        left: 0;
-        right: 0;
         margin: 0 auto;
         transform-origin: center;
     }
 
-    /* 4. Atur cover dan halaman untuk mobile */
-    .front_cover,
-    .back_cover,
-    .page {
-        transform-origin: left center;
-    }
-
-    /* 5. Atur ulang posisi dan ukuran halaman */
     .page {
         width: calc(90vw - 10px);
         height: calc((90vw * 420 / 298) - 20px);
         max-width: 390px;
         max-height: 540px;
-        top: 10px;
-        left: 5px;
     }
 
-    /* 6. Perbaiki ukuran gambar untuk mobile */
-    .edge_shading {
+    .edge_shading,
+    .front_content,
+    .back_content {
         width: 100%;
         height: 100%;
     }
 
-    .front_content {
-        width: calc(100% - 1px);
-        height: calc(100% - 2px);
-    }
-
-    .back_content {
-        width: calc(100% - 1px);
-        height: calc(100% - 2px);
-        left: 1px;
-    }
-
-    /* 7. Atur transform untuk mobile view */
-    #cover_checkbox:checked ~ #flip_book {
-        transform: none !important;
-    }
-
-    #cover_checkbox:checked ~ #flip_book .front_cover {
-        transform: rotateY(-180deg);
-        z-index: 1;
-    }
-
-    /* 8. Atur z-index untuk halaman yang sedang aktif */
-    #page1_checkbox:checked ~ #flip_book #page1 {
-        transform: rotateY(-180deg);
-        z-index: 9;
-    }
-
-    #page2_checkbox:checked ~ #flip_book #page2 {
-        transform: rotateY(-180deg);
-        z-index: 10;
-    }
-
-    #page3_checkbox:checked ~ #flip_book #page3 {
-        transform: rotateY(-180deg);
-        z-index: 11;
-    }
-
-    #page4_checkbox:checked ~ #flip_book #page4 {
-        transform: rotateY(-180deg);
-        z-index: 12;
-    }
-
-    #page5_checkbox:checked ~ #flip_book #page5 {
-        transform: rotateY(-180deg);
-        z-index: 13;
-    }
-
-    #page6_checkbox:checked ~ #flip_book #page6 {
-        transform: rotateY(-180deg);
-        z-index: 14;
-    }
-
-    #page7_checkbox:checked ~ #flip_book #page7 {
-        transform: rotateY(-180deg);
-        z-index: 15;
-    }
-
-    /* 9. Auto-panning untuk mobile */
-    /* Saat cover terbuka */
+    /* Auto-panning untuk mobile */
     #cover_checkbox:checked ~ #flip_book {
         transform: translateX(calc(50vw - 25%)) !important;
     }
 
-    /* Saat halaman1 aktif */
     #page1_checkbox:checked ~ #flip_book {
         transform: translateX(calc(50vw - 30%)) !important;
     }
 
-    /* Saat halaman2 aktif */
     #page2_checkbox:checked ~ #flip_book {
         transform: translateX(calc(50vw - 35%)) !important;
     }
 
-    /* Saat halaman3 aktif */
     #page3_checkbox:checked ~ #flip_book {
         transform: translateX(calc(50vw - 40%)) !important;
     }
 
-    /* Saat halaman4 aktif */
     #page4_checkbox:checked ~ #flip_book {
         transform: translateX(calc(50vw - 45%)) !important;
     }
 
-    /* Saat halaman5 aktif */
     #page5_checkbox:checked ~ #flip_book {
         transform: translateX(calc(50vw - 50%)) !important;
     }
 
-    /* Saat halaman6 aktif */
     #page6_checkbox:checked ~ #flip_book {
         transform: translateX(calc(50vw - 55%)) !important;
     }
 
-    /* Saat halaman7 aktif */
     #page7_checkbox:checked ~ #flip_book {
         transform: translateX(calc(50vw - 60%)) !important;
     }
 }
 
-/* 10. Tambahan untuk very small screens */
+/* Untuk layar sangat kecil */
 @media (max-width: 480px) {
     #flip_book {
         width: 95vw;
