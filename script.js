@@ -30,14 +30,12 @@ function applyMode(mode) {
 		toggleModeBtn.style.color = "rgb(245, 245, 245)";
 		toggleModeBtn.innerHTML = '<i class="bi bi-sun-fill"></i>';
 
-        // Code portfolioLink dihapus karena elemen tidak ditemukan di HTML
 		if(responsiveWarning) responsiveWarning.style.backgroundColor = "rgb(2, 4, 8)";
 	} else {
 		// Set light mode styles.
 		toggleModeBtn.style.color = "rgb(2, 4, 8)";
 		toggleModeBtn.innerHTML = '<i class="bi bi-moon-stars-fill"></i>';
 
-        // Code portfolioLink dihapus karena elemen tidak ditemukan di HTML
 		if(responsiveWarning) responsiveWarning.style.backgroundColor = "rgb(245, 245, 245)";
 	}
 }
