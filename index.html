@@ -2,314 +2,504 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Warta Jemaat Online</title>
-    
-    <!-- Favicon dummy -->
-    <link rel="icon" href="data:,">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flipbook Gambar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --bg-color: #ffffff;
-            --paper-color: #fdfbf7;
-        }
-
-        body {
+        * {
             margin: 0;
             padding: 0;
-            background-color: var(--bg-color);
-            background-image: radial-gradient(circle at center, #f3f9ff 0%, #eff6fd 100%);
-            height: 100vh;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            width: 100%;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.2rem;
+        }
+        
+        .flipbook-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: sans-serif;
+            width: 100%;
+            max-width: 1200px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .book {
+            width: 90%;
+            max-width: 900px;
+            height: 500px;
+            perspective: 1500px;
+            position: relative;
+        }
+        
+        .page {
+            width: 50%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform-style: preserve-3d;
+            transform-origin: left center;
+            transition: transform 1s ease-in-out;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
             overflow: hidden;
         }
-
-        /* Loading Overlay */
-        #loading {
+        
+        .page-front, .page-back {
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: var(--bg-color);
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: white;
+        }
+        
+        .page-back {
+            transform: rotateY(180deg);
+        }
+        
+        .page img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .page-number {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            margin-top: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11);
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1);
+        }
+        
+        button:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .page-counter {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2c3e50;
+            min-width: 150px;
+            text-align: center;
+        }
+        
+        .instructions {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 900px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .instructions h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .instructions ul {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .book {
+                height: 400px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .controls {
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+            
+            button {
+                padding: 10px 20px;
+                font-size: 1rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .book {
+                height: 300px;
+            }
+            
+            h1 {
+                font-size: 1.6rem;
+            }
+            
+            .page-counter {
+                font-size: 1.1rem;
+            }
+            
+            .instructions {
+                padding: 15px;
+            }
+        }
+        
+        .cover {
+            background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
+            color: white;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 9999;
-            color: white;
-            transition: opacity 0.5s;
-        }
-
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(255,255,255,0.3);
-            border-top: 5px solid #fff;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* Container Buku */
-        .book-container {
-            position: relative;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
-        }
-
-        #flipbook {
-            display: none; /* Disembunyikan sampai gambar siap */
-        }
-
-        /* Styling Halaman */
-        .page {
-            background-color: var(--paper-color);
-            overflow: hidden;
-        }
-
-        .page img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain; /* Agar gambar tidak gepeng */
-            display: block;
-        }
-
-        /* Shadow effect untuk kedalaman */
-        .page {
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
-        }
-
-        /* Controls Navigasi */
-        .controls {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(5px);
-            padding: 10px 20px;
-            border-radius: 50px;
-            display: flex;
-            gap: 15px;
-            z-index: 100;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.5s;
-        }
-
-        .controls.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        .btn {
-            background: transparent;
-            border: 1px solid rgba(255,255,255,0.3);
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            transition: all 0.2s;
-        }
-
-        .btn:hover {
-            background: white;
-            color: #333;
-        }
-
-        /* Pesan Error jika gambar tidak ketemu */
-        #error-msg {
-            display: none;
-            color: #ff6b6b;
-            background: rgba(0,0,0,0.8);
-            padding: 20px;
-            border-radius: 8px;
             text-align: center;
+            padding: 20px;
+        }
+        
+        .cover h2 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .cover p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            font-size: 1.5rem;
+            color: #7f8c8d;
         }
     </style>
 </head>
 <body>
-
-    <!-- Loading Screen -->
-    <div id="loading">
-        <div class="spinner"></div>
-        <div id="loading-text">Memuat Buku...</div>
+    <div class="header">
+        <h1><i class="fas fa-book-open"></i> Flipbook Interaktif</h1>
+        <p class="subtitle">Kumpulan gambar dari 1.jpg hingga 12.jpg</p>
     </div>
-
-    <!-- Error Message -->
-    <div id="error-msg">
-        <h3>Gagal Memuat</h3>
-        <p>Pastikan folder <strong>img</strong> ada dan berisi gambar bernama 1.jpg, 2.jpg, dst.</p>
-    </div>
-
-    <!-- Area Buku -->
-    <div class="book-container">
-        <div id="flipbook">
-            <!-- Halaman akan di-generate otomatis via JS -->
+    
+    <div class="flipbook-container">
+        <div class="book" id="book">
+            <!-- Halaman akan dibuat secara dinamis dengan JavaScript -->
         </div>
     </div>
-
-    <!-- Tombol Navigasi -->
-    <div class="controls" id="controls">
-        <button class="btn" onclick="prevPage()">&#10094;</button>
-        <button class="btn" onclick="nextPage()">&#10095;</button>
+    
+    <div class="controls">
+        <button id="prev-btn" disabled>
+            <i class="fas fa-chevron-left"></i> Halaman Sebelumnya
+        </button>
+        
+        <div class="page-counter">
+            Halaman: <span id="current-page">1</span> dari <span id="total-pages">12</span>
+        </div>
+        
+        <button id="next-btn">
+            Halaman Berikutnya <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+    
+    <div class="instructions">
+        <h2><i class="fas fa-info-circle"></i> Cara Menggunakan Flipbook</h2>
+        <ul>
+            <li>Gunakan tombol <strong>"Halaman Sebelumnya"</strong> dan <strong>"Halaman Berikutnya"</strong> untuk membalik halaman</li>
+            <li>Anda juga dapat mengklik pada sudut kanan halaman untuk membalik ke halaman berikutnya</li>
+            <li>Flipbook ini berisi 12 gambar yang telah Anda upload ke folder <code>img</code></li>
+            <li>Pastikan gambar dengan nama <code>1.jpg</code> hingga <code>12.jpg</code> sudah tersedia di folder <code>img</code></li>
+        </ul>
     </div>
 
-    <!-- Libraries (jQuery & Turn.js) -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/3/turn.min.js"></script>
-
     <script>
-        // ==========================================
-        // PENGATURAN (Sesuaikan di sini)
-        // ==========================================
-        const CONFIG = {
-            folderName: 'img',      // Nama folder gambar Anda
-            totalImages: 12,        // JUMLAH TOTAL GAMBAR (Ubah angka ini!)
-            fileExtension: '.jpg',  // Format gambar (.jpg atau .png)
-            baseWidth: 900          // Lebar dasar buku di desktop
-        };
-
-        // ==========================================
-        // LOGIKA PROGRAM
-        // ==========================================
-        
-        let bookWidth = 0;
-        let bookHeight = 0;
-        let isMobile = window.innerWidth <= 768;
-
-        $(document).ready(function() {
-            initBook();
-        });
-
-        function initBook() {
-            const flipbook = $('#flipbook');
-            const loadingText = $('#loading-text');
-
-            // 1. Preload Gambar Pertama untuk mengetahui Aspek Rasio (Tinggi/Lebar)
-            const firstImgPath = `${CONFIG.folderName}/1${CONFIG.fileExtension}`;
-            const tempImg = new Image();
+        document.addEventListener('DOMContentLoaded', function() {
+            // Konfigurasi flipbook
+            const totalPages = 12;
+            let currentPage = 1;
             
-            tempImg.src = firstImgPath;
+            // Elemen DOM
+            const bookElement = document.getElementById('book');
+            const prevButton = document.getElementById('prev-btn');
+            const nextButton = document.getElementById('next-btn');
+            const currentPageElement = document.getElementById('current-page');
+            const totalPagesElement = document.getElementById('total-pages');
             
-            tempImg.onload = function() {
-                // Hitung rasio berdasarkan gambar asli
-                const aspectRatio = this.naturalHeight / this.naturalWidth;
-
-                // Tentukan Ukuran Buku
-                if (isMobile) {
-                    // Mobile: Lebar mengikuti layar - padding
-                    bookWidth = window.innerWidth - 30; 
-                    bookHeight = bookWidth * aspectRatio;
-                } else {
-                    // Desktop: Lebar fix sesuai config, tinggi menyesuaikan
-                    bookWidth = CONFIG.baseWidth;
-                    bookHeight = bookWidth * (aspectRatio / 2); // Dibagi 2 karena 2 halaman
+            // Inisialisasi total halaman
+            totalPagesElement.textContent = totalPages;
+            
+            // Buat halaman flipbook
+            function createPages() {
+                // Halaman sampul depan
+                const coverFront = document.createElement('div');
+                coverFront.className = 'page';
+                coverFront.id = 'page-cover';
+                coverFront.style.zIndex = totalPages * 2;
+                
+                const coverFrontContent = document.createElement('div');
+                coverFrontContent.className = 'page-front cover';
+                coverFrontContent.innerHTML = `
+                    <div>
+                        <h2>Flipbook Gambar</h2>
+                        <p>Kumpulan 12 Gambar</p>
+                        <p style="margin-top: 30px; font-size: 1rem;">Klik tombol berikutnya untuk mulai</p>
+                    </div>
+                `;
+                
+                const coverBackContent = document.createElement('div');
+                coverBackContent.className = 'page-back';
+                const img1 = document.createElement('img');
+                img1.src = 'img/1.jpg';
+                img1.alt = 'Gambar 1';
+                coverBackContent.appendChild(img1);
+                
+                const pageNum1 = document.createElement('div');
+                pageNum1.className = 'page-number';
+                pageNum1.textContent = '1';
+                coverBackContent.appendChild(pageNum1);
+                
+                coverFront.appendChild(coverFrontContent);
+                coverFront.appendChild(coverBackContent);
+                bookElement.appendChild(coverFront);
+                
+                // Halaman tengah (2-11)
+                for (let i = 2; i <= totalPages - 1; i++) {
+                    const page = document.createElement('div');
+                    page.className = 'page';
+                    page.id = `page-${i}`;
+                    page.style.zIndex = (totalPages - i + 1) * 2;
+                    
+                    const pageFront = document.createElement('div');
+                    pageFront.className = 'page-front';
+                    const imgFront = document.createElement('img');
+                    imgFront.src = `img/${i-1}.jpg`;
+                    imgFront.alt = `Gambar ${i-1}`;
+                    pageFront.appendChild(imgFront);
+                    
+                    const pageNumFront = document.createElement('div');
+                    pageNumFront.className = 'page-number';
+                    pageNumFront.textContent = `${i-1}`;
+                    pageFront.appendChild(pageNumFront);
+                    
+                    const pageBack = document.createElement('div');
+                    pageBack.className = 'page-back';
+                    const imgBack = document.createElement('img');
+                    imgBack.src = `img/${i}.jpg`;
+                    imgBack.alt = `Gambar ${i}`;
+                    pageBack.appendChild(imgBack);
+                    
+                    const pageNumBack = document.createElement('div');
+                    pageNumBack.className = 'page-number';
+                    pageNumBack.textContent = `${i}`;
+                    pageBack.appendChild(pageNumBack);
+                    
+                    page.appendChild(pageFront);
+                    page.appendChild(pageBack);
+                    bookElement.appendChild(page);
                 }
-
-                // 2. Generate Halaman ke DOM
-                generatePages(aspectRatio);
-
-                // 3. Inisialisasi Turn.js
-                setupTurnJs();
                 
-                // 4. Tampilkan Buku & Sembunyikan Loading
-                flipbook.show();
-                $('#loading').fadeOut();
-                $('#controls').addClass('active');
-            };
-
-            tempImg.onerror = function() {
-                $('#loading').hide();
-                $('#error-msg').show();
-                console.error("Gagal memuat gambar pertama: " + firstImgPath);
-            };
-        }
-
-        function generatePages(aspectRatio) {
-            const flipbook = $('#flipbook');
-            const loadingText = $('#loading-text');
-            flipbook.empty();
-
-            // Loop dari 1 sampai totalImages
-            for (let i = 1; i <= CONFIG.totalImages; i++) {
-                const imgPath = `${CONFIG.folderName}/${i}${CONFIG.fileExtension}`;
+                // Halaman terakhir
+                const lastPage = document.createElement('div');
+                lastPage.className = 'page';
+                lastPage.id = `page-${totalPages}`;
+                lastPage.style.zIndex = 2;
                 
-                // Buat elemen div page
-                const pageDiv = document.createElement('div');
-                pageDiv.className = 'page';
+                const lastPageFront = document.createElement('div');
+                lastPageFront.className = 'page-front';
+                const imgLastFront = document.createElement('img');
+                imgLastFront.src = `img/${totalPages-1}.jpg`;
+                imgLastFront.alt = `Gambar ${totalPages-1}`;
+                lastPageFront.appendChild(imgLastFront);
                 
-                // Set ukuran halaman
-                const pageWidth = isMobile ? bookWidth : (bookWidth / 2);
-                pageDiv.style.width = pageWidth + 'px';
-                pageDiv.style.height = bookHeight + 'px';
-
-                // Buat elemen gambar
-                const img = document.createElement('img');
-                img.src = imgPath;
-                img.alt = `Halaman ${i}`;
+                const pageNumLastFront = document.createElement('div');
+                pageNumLastFront.className = 'page-number';
+                pageNumLastFront.textContent = `${totalPages-1}`;
+                lastPageFront.appendChild(pageNumLastFront);
                 
-                // Event untuk update loading text
-                img.onload = function() {
-                    loadingText.text(`Memuat Halaman ${i}/${CONFIG.totalImages}...`);
-                };
-                img.onerror = function() {
-                    console.warn(`Gambar ${i} tidak ditemukan.`);
-                };
-
-                pageDiv.appendChild(img);
-                flipbook.append(pageDiv);
+                const lastPageBack = document.createElement('div');
+                lastPageBack.className = 'page-back cover';
+                lastPageBack.innerHTML = `
+                    <div>
+                        <h2>Selesai!</h2>
+                        <p>Anda telah melihat semua gambar</p>
+                        <p style="margin-top: 30px; font-size: 1rem;">Klik tombol sebelumnya untuk melihat kembali</p>
+                    </div>
+                `;
+                
+                lastPage.appendChild(lastPageFront);
+                lastPage.appendChild(lastPageBack);
+                bookElement.appendChild(lastPage);
             }
-        }
-
-        function setupTurnJs() {
-            const flipbook = $('#flipbook');
             
-            flipbook.turn({
-                width: bookWidth,
-                height: bookHeight,
-                autoCenter: true,
-                duration: 800,
-                acceleration: true,
-                gradients: true,
-                elevation: 50,
-                display: isMobile ? "single" : "double",
-                when: {
-                    turning: function(e, page, view) {
-                        // Optional: Log saat berpindah
+            // Fungsi untuk membalik halaman
+            function flipToPage(pageNumber) {
+                // Update current page
+                currentPage = pageNumber;
+                currentPageElement.textContent = currentPage;
+                
+                // Reset semua halaman ke posisi awal
+                const allPages = document.querySelectorAll('.page');
+                allPages.forEach(page => {
+                    page.style.transform = '';
+                    page.style.pointerEvents = 'auto';
+                });
+                
+                // Balik halaman yang diperlukan
+                for (let i = 2; i <= pageNumber; i++) {
+                    const page = document.getElementById(`page-${i}`);
+                    if (page) {
+                        page.style.transform = 'rotateY(-180deg)';
+                        
+                        // Nonaktifkan interaksi pada halaman yang sudah dibalik
+                        if (i < pageNumber) {
+                            page.style.pointerEvents = 'none';
+                        }
+                    }
+                }
+                
+                // Atur status tombol
+                prevButton.disabled = (currentPage === 1);
+                nextButton.disabled = (currentPage === totalPages);
+            }
+            
+            // Event listeners untuk tombol
+            prevButton.addEventListener('click', function() {
+                if (currentPage > 1) {
+                    flipToPage(currentPage - 1);
+                }
+            });
+            
+            nextButton.addEventListener('click', function() {
+                if (currentPage < totalPages) {
+                    flipToPage(currentPage + 1);
+                }
+            });
+            
+            // Event listener untuk klik pada halaman (untuk membalik)
+            bookElement.addEventListener('click', function(e) {
+                const page = e.target.closest('.page');
+                if (!page) return;
+                
+                const pageId = page.id;
+                const pageNumber = parseInt(pageId.replace('page-', ''));
+                
+                // Jika diklik di bagian kanan halaman dan belum terbuka sepenuhnya
+                if (pageNumber === currentPage && currentPage < totalPages) {
+                    const rect = page.getBoundingClientRect();
+                    const clickX = e.clientX - rect.left;
+                    
+                    // Jika diklik di bagian kanan (40% terakhir) dari halaman
+                    if (clickX > rect.width * 0.6) {
+                        flipToPage(currentPage + 1);
                     }
                 }
             });
-        }
-
-        // Fungsi Navigasi
-        window.prevPage = function() {
-            $("#flipbook").turn("previous");
-        }
-        window.nextPage = function() {
-            $("#flipbook").turn("next");
-        }
-
-        // Handle Window Resize
-        let resizeTimeout;
-        $(window).resize(function() {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(function() {
-                // Jika mode berubah (Mobile <-> Desktop), reload halaman
-                const newIsMobile = window.innerWidth <= 768;
-                if (newIsMobile !== isMobile) {
-                    location.reload(); 
-                }
-            }, 300);
+            
+            // Inisialisasi flipbook
+            createPages();
+            flipToPage(1);
+            
+            // Tambahkan efek loading untuk gambar
+            const images = document.querySelectorAll('img');
+            images.forEach(img => {
+                // Tambahkan loading spinner sebelum gambar dimuat
+                const originalSrc = img.src;
+                img.src = '';
+                
+                // Buat elemen loading
+                const loadingDiv = document.createElement('div');
+                loadingDiv.className = 'loading';
+                loadingDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memuat gambar...';
+                img.parentNode.insertBefore(loadingDiv, img);
+                
+                // Load gambar
+                const image = new Image();
+                image.onload = function() {
+                    img.src = originalSrc;
+                    loadingDiv.remove();
+                };
+                image.onerror = function() {
+                    loadingDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Gagal memuat gambar';
+                    loadingDiv.style.color = '#e74c3c';
+                };
+                image.src = originalSrc;
+            });
         });
-
     </script>
 </body>
 </html>
