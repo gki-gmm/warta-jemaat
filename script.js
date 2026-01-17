@@ -8,9 +8,17 @@ const responsiveDesign = true;
 
 // Show mobile warning if the user is on mobile and responsive-design is false.
 if (!responsiveDesign && window.innerWidth <= 768) {
-	if(responsiveWarning) responsiveWarning.classList.add("show");
+    if(responsiveWarning) responsiveWarning.classList.add("show");
 }
 
+// Tambahkan fungsi untuk handle resize
+window.addEventListener('resize', function() {
+    if (!responsiveDesign && window.innerWidth <= 768) {
+        if(responsiveWarning) responsiveWarning.classList.add("show");
+    } else {
+        if(responsiveWarning) responsiveWarning.classList.remove("show");
+    }
+});
 
 /***********************
 * MODE TOGGLE BEHAVIOR *
