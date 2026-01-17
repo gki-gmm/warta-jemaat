@@ -14,210 +14,138 @@
         }
         
         body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background-color: #f0f0f0;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            color: #333;
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            width: 100%;
-            padding: 20px;
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        h1 {
-            color: #2c3e50;
-            margin-bottom: 10px;
-            font-size: 2.5rem;
-        }
-        
-        .subtitle {
-            color: #7f8c8d;
-            font-size: 1.2rem;
-        }
-        
-        .flipbook-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 100%;
-            max-width: 1200px;
-            margin-bottom: 30px;
+            padding: 20px;
+        }
+        
+        .flipbook-container {
             position: relative;
+            width: 100%;
+            max-width: 1000px;
+            height: 600px;
         }
         
         .book {
-            width: 90%;
-            max-width: 900px;
-            height: 500px;
-            perspective: 1500px;
+            width: 100%;
+            height: 100%;
             position: relative;
+            perspective: 2000px;
         }
         
         .page {
-            width: 50%;
-            height: 100%;
             position: absolute;
+            width: 100%;
+            height: 100%;
             top: 0;
-            left: 50%;
+            left: 0;
             transform-style: preserve-3d;
             transform-origin: left center;
-            transition: transform 1s ease-in-out;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-            border-radius: 5px;
-            overflow: hidden;
+            transition: transform 0.8s cubic-bezier(0.42, 0, 0.58, 1);
+            z-index: 1;
         }
         
-        .page-front, .page-back {
+        .page.flipped {
+            transform: rotateY(-180deg);
+            z-index: 2;
+        }
+        
+        .page.flipped .front {
+            z-index: 1;
+        }
+        
+        .page.flipped .back {
+            z-index: 2;
+        }
+        
+        .front, .back {
             position: absolute;
             width: 100%;
             height: 100%;
             backface-visibility: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: white;
+            background: white;
+            border-radius: 3px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
         }
         
-        .page-back {
+        .front {
+            z-index: 2;
+            transform: rotateY(0deg);
+        }
+        
+        .back {
             transform: rotateY(180deg);
         }
         
-        .page img {
+        .page-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .page-content img {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
         }
         
-        .page-number {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            background-color: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.9rem;
-        }
-        
-        .controls {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 30px;
-            margin-top: 20px;
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-size: 1.1rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11);
-        }
-        
-        button:hover {
-            background-color: #2980b9;
-            transform: translateY(-2px);
-            box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1);
-        }
-        
-        button:disabled {
-            background-color: #bdc3c7;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        
-        .page-counter {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #2c3e50;
-            min-width: 150px;
-            text-align: center;
-        }
-        
-        .instructions {
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 25px;
-            border-radius: 15px;
-            margin-top: 20px;
+        .text-content {
             width: 100%;
-            max-width: 900px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            height: 100%;
+            padding: 30px;
+            overflow-y: auto;
         }
         
-        .instructions h2 {
+        .text-content h1 {
             color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 2.2rem;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        .text-content h2 {
+            color: #2980b9;
+            margin: 15px 0;
+            font-size: 1.6rem;
+        }
+        
+        .text-content h3 {
+            color: #16a085;
+            margin: 12px 0;
+            font-size: 1.3rem;
+        }
+        
+        .text-content p {
+            line-height: 1.6;
             margin-bottom: 15px;
-            font-size: 1.5rem;
+            color: #333;
         }
         
-        .instructions ul {
+        .text-content ul {
             margin-left: 20px;
-            line-height: 1.8;
+            margin-bottom: 20px;
         }
         
-        .instructions li {
-            margin-bottom: 10px;
+        .text-content li {
+            margin-bottom: 8px;
+            line-height: 1.5;
         }
         
-        @media (max-width: 768px) {
-            .book {
-                height: 400px;
-            }
-            
-            h1 {
-                font-size: 2rem;
-            }
-            
-            .controls {
-                flex-wrap: wrap;
-                gap: 15px;
-            }
-            
-            button {
-                padding: 10px 20px;
-                font-size: 1rem;
-            }
+        .text-content a {
+            color: #3498db;
+            text-decoration: none;
         }
         
-        @media (max-width: 480px) {
-            .book {
-                height: 300px;
-            }
-            
-            h1 {
-                font-size: 1.6rem;
-            }
-            
-            .page-counter {
-                font-size: 1.1rem;
-            }
-            
-            .instructions {
-                padding: 15px;
-            }
+        .text-content a:hover {
+            text-decoration: underline;
         }
         
         .cover {
@@ -228,7 +156,6 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 20px;
         }
         
         .cover h2 {
@@ -239,59 +166,192 @@
         .cover p {
             font-size: 1.2rem;
             opacity: 0.9;
+            margin-bottom: 30px;
         }
         
+        .page-number {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            z-index: 10;
+        }
+        
+        .navigation {
+            position: absolute;
+            bottom: -60px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            padding-top: 20px;
+        }
+        
+        .nav-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 3px 6px rgba(50, 50, 93, 0.1);
+        }
+        
+        .nav-btn:hover:not(:disabled) {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(50, 50, 93, 0.15);
+        }
+        
+        .nav-btn:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .page-counter {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            min-width: 120px;
+            text-align: center;
+        }
+        
+        .click-hint {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 5px 10px;
+            border-radius: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .flipbook-container {
+                height: 500px;
+            }
+            
+            .text-content {
+                padding: 20px;
+            }
+            
+            .text-content h1 {
+                font-size: 1.8rem;
+            }
+            
+            .text-content h2 {
+                font-size: 1.4rem;
+            }
+            
+            .cover h2 {
+                font-size: 2rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .flipbook-container {
+                height: 400px;
+            }
+            
+            .navigation {
+                flex-wrap: wrap;
+                gap: 10px;
+                bottom: -80px;
+            }
+            
+            .nav-btn {
+                padding: 6px 15px;
+                font-size: 0.9rem;
+            }
+            
+            .page-counter {
+                order: 3;
+                width: 100%;
+                margin-top: 10px;
+            }
+        }
+        
+        /* Efek bayangan saat membalik */
+        .page::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(0,0,0,0) 90%, rgba(0,0,0,0.1) 100%);
+            border-radius: 3px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 5;
+        }
+        
+        .page:hover::before {
+            opacity: 1;
+        }
+        
+        /* Efek kertas */
+        .front, .back {
+            background-color: #fefefe;
+            background-image: 
+                linear-gradient(90deg, transparent 79px, #abced4 79px, #abced4 81px, transparent 81px),
+                linear-gradient(#eee .1em, transparent .1em);
+            background-size: 100% 1.2em;
+        }
+        
+        /* Loading state */
         .loading {
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100%;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             color: #7f8c8d;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1><i class="fas fa-book-open"></i> Flipbook Interaktif</h1>
-        <p class="subtitle">Kumpulan gambar dari 1.jpg hingga 12.jpg</p>
-    </div>
-    
     <div class="flipbook-container">
         <div class="book" id="book">
             <!-- Halaman akan dibuat secara dinamis dengan JavaScript -->
         </div>
-    </div>
-    
-    <div class="controls">
-        <button id="prev-btn" disabled>
-            <i class="fas fa-chevron-left"></i> Halaman Sebelumnya
-        </button>
         
-        <div class="page-counter">
-            Halaman: <span id="current-page">1</span> dari <span id="total-pages">12</span>
+        <div class="navigation">
+            <button class="nav-btn" id="prev-btn">
+                <i class="fas fa-chevron-left"></i> Sebelumnya
+            </button>
+            
+            <div class="page-counter">
+                Halaman: <span id="current-page">1</span> dari <span id="total-pages">12</span>
+            </div>
+            
+            <button class="nav-btn" id="next-btn">
+                Berikutnya <i class="fas fa-chevron-right"></i>
+            </button>
         </div>
-        
-        <button id="next-btn">
-            Halaman Berikutnya <i class="fas fa-chevron-right"></i>
-        </button>
-    </div>
-    
-    <div class="instructions">
-        <h2><i class="fas fa-info-circle"></i> Cara Menggunakan Flipbook</h2>
-        <ul>
-            <li>Gunakan tombol <strong>"Halaman Sebelumnya"</strong> dan <strong>"Halaman Berikutnya"</strong> untuk membalik halaman</li>
-            <li>Anda juga dapat mengklik pada sudut kanan halaman untuk membalik ke halaman berikutnya</li>
-            <li>Flipbook ini berisi 12 gambar yang telah Anda upload ke folder <code>img</code></li>
-            <li>Pastikan gambar dengan nama <code>1.jpg</code> hingga <code>12.jpg</code> sudah tersedia di folder <code>img</code></li>
-        </ul>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Konfigurasi flipbook
             const totalPages = 12;
-            let currentPage = 1;
+            let currentPage = 0; // 0-based index
             
             // Elemen DOM
             const bookElement = document.getElementById('book');
@@ -303,202 +363,320 @@
             // Inisialisasi total halaman
             totalPagesElement.textContent = totalPages;
             
+            // Data konten untuk halaman-halaman khusus
+            const pageContents = [
+                {
+                    type: 'cover',
+                    title: 'Flipbook Interaktif',
+                    subtitle: 'Kumpulan gambar dari 1.jpg hingga 12.jpg'
+                },
+                {
+                    type: 'text',
+                    content: `
+                        <h1>AĪZIŠKODIJA IZSTĀJAS ĀPJAIS</h1>
+                        <h2>DIAVĀRZUMI - ZAM ITAĪJĀM AJŅĀ</h2>
+                        <h3>"DIAVĀRZUMI DAIY TAMĪLI ĶĪMIJM": AMZT</h3>
+                        
+                        <p><strong>smarzd medpilsētā mājās gūsim izgādāt nabadzot sadalījumiem taisnīgi: AMZT BUD</strong></p>
+                        
+                        <p><a href="http://www.amzt.lv">www.amzt.lv</a><br>
+                        <a href="mailto:amzt@amzt.lv">amzt@amzt.lv</a></p>
+                        
+                        <hr>
+                        
+                        <h3>VĪRAJ AIKTAVĀJS</h3>
+                        <ul>
+                            <li><strong>abamst 3. apmērā neattiecībā</strong><br>BW oos_apgmkt</li>
+                            <li><strong>azavod neattiecībā</strong><br>BW oos_amdz</li>
+                        </ul>
+                        
+                        <h3>MZA NEATTIEKOJS</h3>
+                        <ul>
+                            <li><strong>8 – e zāls</strong><br>BW octe_apgmkt</li>
+                            <li><strong>e zāls – eizāls</strong><br>BW octe_apgmkt</li>
+                        </ul>
+                        
+                        <h3>mums neattiecībā</h3>
+                        <ul>
+                            <li><strong>1 mumī neattiecībā</strong><br>BW octe_apgmkt</li>
+                            <li><strong>II mumī neattiecībā</strong><br>BW octe_apgmkt</li>
+                        </ul>
+                    `
+                },
+                {
+                    type: 'text',
+                    content: `
+                        <h2>Jāiegūt zem jālojošoļoņi</h2>
+                        <p>neatklāms, atslēdzot lielām būs uzskaitīm un blīdz piegriežot kārtību. Uz vēlamu, šobrīd, ja to varēs ir bijis pēc piegriežojuma, izveidot arī darba un attiecību arī uzdi, parakstīt savu darbu, laicīgi, pieaugušajiem, kas jāatrod, laikā norādīt arī arī arī arī arī arī arī arī arī arā arī arī arī arī arī arī arī arī arī arās.</p>
+                        
+                        <p>...Būs neatkarīgs, bet jāatrod, laikā norādīt arī arī arī arī arī arī arī arī arī arī arā arī arī arī arī arī arī arī arī arī arās.</p>
+                        
+                        <div style="text-align: center; margin-top: 50px;">
+                            <p><em>Klik tombol berikutnya untuk mulai</em></p>
+                        </div>
+                    `
+                }
+            ];
+            
             // Buat halaman flipbook
             function createPages() {
                 // Halaman sampul depan
-                const coverFront = document.createElement('div');
-                coverFront.className = 'page';
-                coverFront.id = 'page-cover';
-                coverFront.style.zIndex = totalPages * 2;
+                createPage(0, true);
                 
-                const coverFrontContent = document.createElement('div');
-                coverFrontContent.className = 'page-front cover';
-                coverFrontContent.innerHTML = `
-                    <div>
-                        <h2>Flipbook Gambar</h2>
-                        <p>Kumpulan 12 Gambar</p>
-                        <p style="margin-top: 30px; font-size: 1rem;">Klik tombol berikutnya untuk mulai</p>
-                    </div>
-                `;
-                
-                const coverBackContent = document.createElement('div');
-                coverBackContent.className = 'page-back';
-                const img1 = document.createElement('img');
-                img1.src = 'img/1.jpg';
-                img1.alt = 'Gambar 1';
-                coverBackContent.appendChild(img1);
-                
-                const pageNum1 = document.createElement('div');
-                pageNum1.className = 'page-number';
-                pageNum1.textContent = '1';
-                coverBackContent.appendChild(pageNum1);
-                
-                coverFront.appendChild(coverFrontContent);
-                coverFront.appendChild(coverBackContent);
-                bookElement.appendChild(coverFront);
-                
-                // Halaman tengah (2-11)
-                for (let i = 2; i <= totalPages - 1; i++) {
-                    const page = document.createElement('div');
-                    page.className = 'page';
-                    page.id = `page-${i}`;
-                    page.style.zIndex = (totalPages - i + 1) * 2;
-                    
-                    const pageFront = document.createElement('div');
-                    pageFront.className = 'page-front';
-                    const imgFront = document.createElement('img');
-                    imgFront.src = `img/${i-1}.jpg`;
-                    imgFront.alt = `Gambar ${i-1}`;
-                    pageFront.appendChild(imgFront);
-                    
-                    const pageNumFront = document.createElement('div');
-                    pageNumFront.className = 'page-number';
-                    pageNumFront.textContent = `${i-1}`;
-                    pageFront.appendChild(pageNumFront);
-                    
-                    const pageBack = document.createElement('div');
-                    pageBack.className = 'page-back';
-                    const imgBack = document.createElement('img');
-                    imgBack.src = `img/${i}.jpg`;
-                    imgBack.alt = `Gambar ${i}`;
-                    pageBack.appendChild(imgBack);
-                    
-                    const pageNumBack = document.createElement('div');
-                    pageNumBack.className = 'page-number';
-                    pageNumBack.textContent = `${i}`;
-                    pageBack.appendChild(pageNumBack);
-                    
-                    page.appendChild(pageFront);
-                    page.appendChild(pageBack);
-                    bookElement.appendChild(page);
+                // Halaman dengan konten khusus
+                for (let i = 1; i <= 2; i++) {
+                    createPage(i, false, pageContents[i]);
                 }
                 
-                // Halaman terakhir
-                const lastPage = document.createElement('div');
-                lastPage.className = 'page';
-                lastPage.id = `page-${totalPages}`;
-                lastPage.style.zIndex = 2;
+                // Halaman dengan gambar (4-12)
+                for (let i = 3; i < totalPages; i++) {
+                    createPage(i, false, { type: 'image', imageIndex: i - 2 });
+                }
                 
-                const lastPageFront = document.createElement('div');
-                lastPageFront.className = 'page-front';
-                const imgLastFront = document.createElement('img');
-                imgLastFront.src = `img/${totalPages-1}.jpg`;
-                imgLastFront.alt = `Gambar ${totalPages-1}`;
-                lastPageFront.appendChild(imgLastFront);
+                // Halaman sampul belakang
+                createPage(totalPages, false, { type: 'cover-back' });
                 
-                const pageNumLastFront = document.createElement('div');
-                pageNumLastFront.className = 'page-number';
-                pageNumLastFront.textContent = `${totalPages-1}`;
-                lastPageFront.appendChild(pageNumLastFront);
-                
-                const lastPageBack = document.createElement('div');
-                lastPageBack.className = 'page-back cover';
-                lastPageBack.innerHTML = `
-                    <div>
-                        <h2>Selesai!</h2>
-                        <p>Anda telah melihat semua gambar</p>
-                        <p style="margin-top: 30px; font-size: 1rem;">Klik tombol sebelumnya untuk melihat kembali</p>
-                    </div>
-                `;
-                
-                lastPage.appendChild(lastPageFront);
-                lastPage.appendChild(lastPageBack);
-                bookElement.appendChild(lastPage);
+                // Update status tombol
+                updateButtons();
             }
             
-            // Fungsi untuk membalik halaman
-            function flipToPage(pageNumber) {
-                // Update current page
-                currentPage = pageNumber;
-                currentPageElement.textContent = currentPage;
+            // Fungsi untuk membuat satu halaman
+            function createPage(pageIndex, isFirst, content = null) {
+                const page = document.createElement('div');
+                page.className = 'page';
+                page.id = `page-${pageIndex}`;
+                page.dataset.index = pageIndex;
                 
-                // Reset semua halaman ke posisi awal
-                const allPages = document.querySelectorAll('.page');
-                allPages.forEach(page => {
-                    page.style.transform = '';
-                    page.style.pointerEvents = 'auto';
-                });
+                // Front side
+                const front = document.createElement('div');
+                front.className = 'front';
                 
-                // Balik halaman yang diperlukan
-                for (let i = 2; i <= pageNumber; i++) {
-                    const page = document.getElementById(`page-${i}`);
-                    if (page) {
-                        page.style.transform = 'rotateY(-180deg)';
+                // Back side
+                const back = document.createElement('div');
+                back.className = 'back';
+                
+                // Tambahkan konten ke halaman
+                if (isFirst) {
+                    // Halaman sampul depan
+                    front.classList.add('cover');
+                    front.innerHTML = `
+                        <div class="page-content">
+                            <div>
+                                <h2>${pageContents[0].title}</h2>
+                                <p>${pageContents[0].subtitle}</p>
+                                <div style="margin-top: 40px;">
+                                    <p><em>Klik tombol berikutnya untuk mulai</em></p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Halaman belakang sampul (gambar 1)
+                    const img1 = document.createElement('img');
+                    img1.src = `img/1.jpg`;
+                    img1.alt = 'Gambar 1';
+                    img1.onerror = function() {
+                        this.parentElement.innerHTML = '<div class="loading"><i class="fas fa-exclamation-triangle"></i> Gambar tidak ditemukan</div>';
+                    };
+                    
+                    const backContent = document.createElement('div');
+                    backContent.className = 'page-content';
+                    backContent.appendChild(img1);
+                    back.appendChild(backContent);
+                    
+                    // Tambahkan nomor halaman
+                    const pageNum = document.createElement('div');
+                    pageNum.className = 'page-number';
+                    pageNum.textContent = '1';
+                    back.appendChild(pageNum);
+                } 
+                else if (content && content.type === 'text') {
+                    // Halaman dengan konten teks
+                    const frontContent = document.createElement('div');
+                    frontContent.className = 'page-content text-content';
+                    frontContent.innerHTML = content.content;
+                    front.appendChild(frontContent);
+                    
+                    // Halaman belakang (gambar)
+                    const imgIndex = pageIndex;
+                    const img = document.createElement('img');
+                    img.src = `img/${imgIndex}.jpg`;
+                    img.alt = `Gambar ${imgIndex}`;
+                    img.onerror = function() {
+                        this.parentElement.innerHTML = '<div class="loading"><i class="fas fa-exclamation-triangle"></i> Gambar tidak ditemukan</div>';
+                    };
+                    
+                    const backContent = document.createElement('div');
+                    backContent.className = 'page-content';
+                    backContent.appendChild(img);
+                    back.appendChild(backContent);
+                    
+                    // Tambahkan nomor halaman
+                    const pageNum = document.createElement('div');
+                    pageNum.className = 'page-number';
+                    pageNum.textContent = `${imgIndex}`;
+                    back.appendChild(pageNum);
+                }
+                else if (content && content.type === 'image') {
+                    // Halaman dengan gambar di depan
+                    const imgFront = document.createElement('img');
+                    imgFront.src = `img/${content.imageIndex}.jpg`;
+                    imgFront.alt = `Gambar ${content.imageIndex}`;
+                    imgFront.onerror = function() {
+                        this.parentElement.innerHTML = '<div class="loading"><i class="fas fa-exclamation-triangle"></i> Gambar tidak ditemukan</div>';
+                    };
+                    
+                    const frontContent = document.createElement('div');
+                    frontContent.className = 'page-content';
+                    frontContent.appendChild(imgFront);
+                    front.appendChild(frontContent);
+                    
+                    // Tambahkan nomor halaman
+                    const pageNumFront = document.createElement('div');
+                    pageNumFront.className = 'page-number';
+                    pageNumFront.textContent = `${content.imageIndex}`;
+                    front.appendChild(pageNumFront);
+                    
+                    // Halaman belakang (gambar berikutnya atau sampul belakang)
+                    if (pageIndex < totalPages - 1) {
+                        const nextImgIndex = content.imageIndex + 1;
+                        const imgBack = document.createElement('img');
+                        imgBack.src = `img/${nextImgIndex}.jpg`;
+                        imgBack.alt = `Gambar ${nextImgIndex}`;
+                        imgBack.onerror = function() {
+                            this.parentElement.innerHTML = '<div class="loading"><i class="fas fa-exclamation-triangle"></i> Gambar tidak ditemukan</div>';
+                        };
                         
-                        // Nonaktifkan interaksi pada halaman yang sudah dibalik
-                        if (i < pageNumber) {
-                            page.style.pointerEvents = 'none';
-                        }
+                        const backContent = document.createElement('div');
+                        backContent.className = 'page-content';
+                        backContent.appendChild(imgBack);
+                        back.appendChild(backContent);
+                        
+                        // Tambahkan nomor halaman
+                        const pageNumBack = document.createElement('div');
+                        pageNumBack.className = 'page-number';
+                        pageNumBack.textContent = `${nextImgIndex}`;
+                        back.appendChild(pageNumBack);
                     }
                 }
+                else if (content && content.type === 'cover-back') {
+                    // Halaman sampul belakang
+                    const imgFront = document.createElement('img');
+                    imgFront.src = `img/${totalPages - 1}.jpg`;
+                    imgFront.alt = `Gambar ${totalPages - 1}`;
+                    imgFront.onerror = function() {
+                        this.parentElement.innerHTML = '<div class="loading"><i class="fas fa-exclamation-triangle"></i> Gambar tidak ditemukan</div>';
+                    };
+                    
+                    const frontContent = document.createElement('div');
+                    frontContent.className = 'page-content';
+                    frontContent.appendChild(imgFront);
+                    front.appendChild(frontContent);
+                    
+                    // Tambahkan nomor halaman
+                    const pageNumFront = document.createElement('div');
+                    pageNumFront.className = 'page-number';
+                    pageNumFront.textContent = `${totalPages - 1}`;
+                    front.appendChild(pageNumFront);
+                    
+                    // Sampul belakang
+                    back.classList.add('cover');
+                    back.innerHTML = `
+                        <div class="page-content">
+                            <div>
+                                <h2>Selesai!</h2>
+                                <p>Anda telah melihat semua gambar</p>
+                                <div style="margin-top: 40px;">
+                                    <p><em>Klik tombol sebelumnya untuk melihat kembali</em></p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
                 
-                // Atur status tombol
-                prevButton.disabled = (currentPage === 1);
-                nextButton.disabled = (currentPage === totalPages);
+                // Tambahkan elemen ke halaman
+                page.appendChild(front);
+                page.appendChild(back);
+                
+                // Tambahkan halaman ke buku
+                bookElement.appendChild(page);
+                
+                // Event listener untuk klik pada halaman
+                page.addEventListener('click', function(e) {
+                    const rect = this.getBoundingClientRect();
+                    const clickX = e.clientX - rect.left;
+                    
+                    // Jika diklik di bagian kanan (30% terakhir) dan belum dibalik
+                    if (clickX > rect.width * 0.7 && !this.classList.contains('flipped') && 
+                        parseInt(this.dataset.index) === currentPage) {
+                        flipNext();
+                    }
+                    
+                    // Jika diklik di bagian kiri (30% pertama) dan sudah dibalik
+                    if (clickX < rect.width * 0.3 && this.classList.contains('flipped') && 
+                        parseInt(this.dataset.index) === currentPage) {
+                        flipPrev();
+                    }
+                });
+            }
+            
+            // Fungsi untuk membalik ke halaman berikutnya
+            function flipNext() {
+                if (currentPage < totalPages - 1) {
+                    const currentPageElement = document.getElementById(`page-${currentPage}`);
+                    if (currentPageElement) {
+                        currentPageElement.classList.add('flipped');
+                    }
+                    
+                    currentPage++;
+                    updateDisplay();
+                }
+            }
+            
+            // Fungsi untuk membalik ke halaman sebelumnya
+            function flipPrev() {
+                if (currentPage > 0) {
+                    const prevPageElement = document.getElementById(`page-${currentPage - 1}`);
+                    if (prevPageElement) {
+                        prevPageElement.classList.remove('flipped');
+                    }
+                    
+                    currentPage--;
+                    updateDisplay();
+                }
+            }
+            
+            // Fungsi untuk memperbarui tampilan
+            function updateDisplay() {
+                // Update nomor halaman yang ditampilkan (1-based untuk user)
+                currentPageElement.textContent = currentPage + 1;
+                
+                // Update status tombol
+                updateButtons();
+            }
+            
+            // Fungsi untuk memperbarui status tombol
+            function updateButtons() {
+                prevButton.disabled = currentPage === 0;
+                nextButton.disabled = currentPage === totalPages - 1;
             }
             
             // Event listeners untuk tombol
-            prevButton.addEventListener('click', function() {
-                if (currentPage > 1) {
-                    flipToPage(currentPage - 1);
-                }
-            });
+            prevButton.addEventListener('click', flipPrev);
+            nextButton.addEventListener('click', flipNext);
             
-            nextButton.addEventListener('click', function() {
-                if (currentPage < totalPages) {
-                    flipToPage(currentPage + 1);
-                }
-            });
-            
-            // Event listener untuk klik pada halaman (untuk membalik)
-            bookElement.addEventListener('click', function(e) {
-                const page = e.target.closest('.page');
-                if (!page) return;
-                
-                const pageId = page.id;
-                const pageNumber = parseInt(pageId.replace('page-', ''));
-                
-                // Jika diklik di bagian kanan halaman dan belum terbuka sepenuhnya
-                if (pageNumber === currentPage && currentPage < totalPages) {
-                    const rect = page.getBoundingClientRect();
-                    const clickX = e.clientX - rect.left;
-                    
-                    // Jika diklik di bagian kanan (40% terakhir) dari halaman
-                    if (clickX > rect.width * 0.6) {
-                        flipToPage(currentPage + 1);
-                    }
+            // Event listener untuk keyboard
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowLeft') {
+                    flipPrev();
+                } else if (e.key === 'ArrowRight') {
+                    flipNext();
                 }
             });
             
             // Inisialisasi flipbook
             createPages();
-            flipToPage(1);
-            
-            // Tambahkan efek loading untuk gambar
-            const images = document.querySelectorAll('img');
-            images.forEach(img => {
-                // Tambahkan loading spinner sebelum gambar dimuat
-                const originalSrc = img.src;
-                img.src = '';
-                
-                // Buat elemen loading
-                const loadingDiv = document.createElement('div');
-                loadingDiv.className = 'loading';
-                loadingDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memuat gambar...';
-                img.parentNode.insertBefore(loadingDiv, img);
-                
-                // Load gambar
-                const image = new Image();
-                image.onload = function() {
-                    img.src = originalSrc;
-                    loadingDiv.remove();
-                };
-                image.onerror = function() {
-                    loadingDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Gagal memuat gambar';
-                    loadingDiv.style.color = '#e74c3c';
-                };
-                image.src = originalSrc;
-            });
+            updateDisplay();
         });
     </script>
 </body>
