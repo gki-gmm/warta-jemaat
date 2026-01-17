@@ -13,8 +13,7 @@
     --dark-hover: rgba(255, 255, 255, 0.1);
     --light-color: rgb(245, 245, 245);
     --light-hover: rgba(0, 0, 0, 0.1);
-    --page-curve: 15px; /* Radius lengkungan kertas */
-    --shadow-intensity: 0.3; /* Intensitas bayangan */
+    --drag-distance: 20px; /* Jarak tarikan */
 }
 
 /* GENERAL */
@@ -116,20 +115,16 @@ input {
     transform-style: preserve-3d;
 }
 
-/* EFEK KERTAS MENDEKUK - KELAS BARU */
-.page-curve {
-    position: absolute;
-    width: 20px;
-    height: 100%;
-    background: linear-gradient(to right, 
-        rgba(0,0,0,0.1) 0%, 
-        rgba(0,0,0,0.05) 50%, 
-        transparent 100%);
-    z-index: 150;
-    pointer-events: none;
-    border-radius: 0 10px 10px 0;
-    opacity: 0;
-    transition: opacity 0.3s;
+/* EFEK DRAG (TARIKAN TANGAN) */
+.page.dragging {
+    transform-origin: left center;
+    transition: transform 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.page.dragging .front_page {
+    box-shadow: 
+        -5px 5px 15px rgba(0,0,0,0.2),
+        inset -1px 0 3px rgba(0,0,0,0.1);
 }
 
 .front_cover,
@@ -144,14 +139,23 @@ input {
     background-color: rgba(180, 160, 255, 0.356);
     box-shadow: 0 0 5px 0 rgba(25, 25, 25, 0.25);
     transform-style: preserve-3d;
-    transition: transform 0.8s cubic-bezier(0.42, 0, 0.58, 1);
+    transition: transform 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .front_cover {
     position: absolute;
-    cursor: pointer;
-    transform-origin: center left;
+    cursor: grab;
+    transform-origin: left center;
     z-index: 99;
+}
+
+.front_cover.dragging {
+    cursor: grabbing;
+    transition: transform 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.front_cover:active {
+    cursor: grabbing;
 }
 
 .front_cover .front_page label {
@@ -160,19 +164,6 @@ input {
     position: absolute;
     cursor: pointer;
     z-index: 10;
-}
-
-/* EFEK HALAMAN YANG SEDANG DIBALIK */
-.page.flipping {
-    z-index: 100 !important;
-}
-
-.page.flipping .front_page {
-    box-shadow: 
-        -5px 0 15px rgba(0,0,0,0.2),
-        inset -2px 0 5px rgba(0,0,0,0.1);
-    transform-origin: left center;
-    transition: transform 0.8s cubic-bezier(0.42, 0, 0.58, 1);
 }
 
 .page {
@@ -187,13 +178,14 @@ input {
     transform-style: preserve-3d;
     transform: rotateY(0deg);
     transition: 
-        transform 0.8s cubic-bezier(0.42, 0, 0.58, 1),
+        transform 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275),
         z-index 0.1s;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    cursor: pointer;
 }
 
-.page:hover {
-    cursor: pointer;
+.page:hover:not(.dragging) {
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
 }
 
 .front_page {
@@ -278,74 +270,72 @@ input {
 #page6 { z-index: 3; }
 #page7 { z-index: 2; }
 
-/* Animasi untuk efek membalik dengan lengkungan */
+/* EFEK DRAG SAAT MEMBUKA (ROTASI DENGAN TRANSLATE) */
 #cover_checkbox:checked ~ #flip_book .front_cover {
-    transform: rotateY(-180deg) scaleX(0.98);
+    transform: rotateY(-180deg) translateX(-10px);
     box-shadow: 
-        -10px 0 20px rgba(0,0,0,0.3),
-        inset -5px 0 10px rgba(0,0,0,0.2);
+        -15px 10px 25px rgba(0,0,0,0.3),
+        inset -5px 0 10px rgba(0,0,0,0.15);
     z-index: 1;
 }
 
-/* Efek lengkungan saat halaman dibalik */
+/* EFEK DRAG UNTUK HALAMAN (TARIKAN KE KIRI SAAT ROTASI) */
 #page1_checkbox:checked ~ #flip_book #page1 { 
-    transform: rotateY(-180deg) scaleX(0.98); 
+    transform: rotateY(-180deg) translateX(-10px); 
     z-index: 9; 
     box-shadow: 
-        -10px 0 20px rgba(0,0,0,0.2),
-        inset -3px 0 8px rgba(0,0,0,0.1);
+        -12px 8px 20px rgba(0,0,0,0.2),
+        inset -3px 0 6px rgba(0,0,0,0.1);
 }
 #page2_checkbox:checked ~ #flip_book #page2 { 
-    transform: rotateY(-180deg) scaleX(0.98); 
+    transform: rotateY(-180deg) translateX(-10px); 
     z-index: 10; 
     box-shadow: 
-        -10px 0 20px rgba(0,0,0,0.2),
-        inset -3px 0 8px rgba(0,0,0,0.1);
+        -12px 8px 20px rgba(0,0,0,0.2),
+        inset -3px 0 6px rgba(0,0,0,0.1);
 }
 #page3_checkbox:checked ~ #flip_book #page3 { 
-    transform: rotateY(-180deg) scaleX(0.98); 
+    transform: rotateY(-180deg) translateX(-10px); 
     z-index: 11; 
     box-shadow: 
-        -10px 0 20px rgba(0,0,0,0.2),
-        inset -3px 0 8px rgba(0,0,0,0.1);
+        -12px 8px 20px rgba(0,0,0,0.2),
+        inset -3px 0 6px rgba(0,0,0,0.1);
 }
 #page4_checkbox:checked ~ #flip_book #page4 { 
-    transform: rotateY(-180deg) scaleX(0.98); 
+    transform: rotateY(-180deg) translateX(-10px); 
     z-index: 12; 
     box-shadow: 
-        -10px 0 20px rgba(0,0,0,0.2),
-        inset -3px 0 8px rgba(0,0,0,0.1);
+        -12px 8px 20px rgba(0,0,0,0.2),
+        inset -3px 0 6px rgba(0,0,0,0.1);
 }
 #page5_checkbox:checked ~ #flip_book #page5 { 
-    transform: rotateY(-180deg) scaleX(0.98); 
+    transform: rotateY(-180deg) translateX(-10px); 
     z-index: 13; 
     box-shadow: 
-        -10px 0 20px rgba(0,0,0,0.2),
-        inset -3px 0 8px rgba(0,0,0,0.1);
+        -12px 8px 20px rgba(0,0,0,0.2),
+        inset -3px 0 6px rgba(0,0,0,0.1);
 }
 #page6_checkbox:checked ~ #flip_book #page6 { 
-    transform: rotateY(-180deg) scaleX(0.98); 
+    transform: rotateY(-180deg) translateX(-10px); 
     z-index: 14; 
     box-shadow: 
-        -10px 0 20px rgba(0,0,0,0.2),
-        inset -3px 0 8px rgba(0,0,0,0.1);
+        -12px 8px 20px rgba(0,0,0,0.2),
+        inset -3px 0 6px rgba(0,0,0,0.1);
 }
 #page7_checkbox:checked ~ #flip_book #page7 { 
-    transform: rotateY(-180deg) scaleX(0.98); 
+    transform: rotateY(-180deg) translateX(-10px); 
     z-index: 15; 
     box-shadow: 
-        -10px 0 20px rgba(0,0,0,0.2),
-        inset -3px 0 8px rgba(0,0,0,0.1);
+        -12px 8px 20px rgba(0,0,0,0.2),
+        inset -3px 0 6px rgba(0,0,0,0.1);
 }
 
 /* RESPONSIVE MOBILE */
 @media (max-width: 768px) {
-    /* Hilangkan peringatan */
     #responsive-warning {
         display: none !important;
     }
 
-    /* Atur ukuran untuk mobile */
     body {
         padding: 10px 0;
         justify-content: flex-start;
@@ -374,6 +364,18 @@ input {
     .back_content {
         width: 100%;
         height: 100%;
+    }
+
+    /* Kurangi efek drag di mobile */
+    #cover_checkbox:checked ~ #flip_book .front_cover,
+    #page1_checkbox:checked ~ #flip_book #page1,
+    #page2_checkbox:checked ~ #flip_book #page2,
+    #page3_checkbox:checked ~ #flip_book #page3,
+    #page4_checkbox:checked ~ #flip_book #page4,
+    #page5_checkbox:checked ~ #flip_book #page5,
+    #page6_checkbox:checked ~ #flip_book #page6,
+    #page7_checkbox:checked ~ #flip_book #page7 {
+        transform: rotateY(-180deg) translateX(-5px) !important;
     }
 
     /* Auto-panning untuk mobile */
@@ -422,7 +424,6 @@ input {
         height: calc((95vw * 420 / 298) - 20px);
     }
     
-    /* Kurangi padding translate untuk layar kecil */
     #cover_checkbox:checked ~ #flip_book,
     #page1_checkbox:checked ~ #flip_book,
     #page2_checkbox:checked ~ #flip_book,
