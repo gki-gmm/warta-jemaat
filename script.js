@@ -18,7 +18,6 @@ if (!responsiveDesign && window.innerWidth <= 768) {
 
 // Get elements that change with the mode.
 const toggleModeBtn = document.getElementById("toggle-mode-btn");
-const portfolioLink = document.getElementById("portfolio-link");
 const body = document.body;
 
 // Function to apply mode.
