@@ -139,7 +139,7 @@ input {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    background-color: rgb(220, 20, 60);
+    background-color: rgba(180, 160, 255, 0.356);
     box-shadow: 0 0 5px 0 rgb(25, 25, 25, 0.25);
 }
 
