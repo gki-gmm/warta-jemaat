@@ -263,3 +263,74 @@ input {
 #page5_checkbox:checked~#flip_book #page5 { transform: rotateY(-180deg); z-index: 6; }
 #page6_checkbox:checked~#flip_book #page6 { transform: rotateY(-180deg); z-index: 7; }
 #page7_checkbox:checked~#flip_book #page7 { transform: rotateY(-180deg); z-index: 8; }
+
+/* ... Kode CSS sebelumnya biarkan saja ... */
+
+/* =========================================
+   RESPONSIVE MOBILE (Tambahan Baru)
+   ========================================= */
+
+@media (max-width: 768px) {
+    /* 1. Hilangkan Peringatan Rotate secara paksa */
+    #responsive-warning {
+        display: none !important;
+    }
+
+    /* 2. Atur Container Flip Book agar mengecil otomatis */
+    #flip_book {
+        /* Logika: Lebar buku terbuka sekitar 600px. 
+           Kita scale berdasarkan lebar layar HP (100vw) dibagi 630px */
+        transform: scale(calc(100vw / 630)); 
+        transform-origin: center top; /* Titik tengah scaling */
+        left: 0;
+    }
+
+    /* 3. PERBAIKAN POSISI SAAT BUKU DIBUKA DI MOBILE */
+    /* Di Desktop, buku geser 144px ke kanan. Di HP, kita buat dia geser lebih sedikit 
+       atau tetap di tengah (72px adalah setengah halaman) agar terlihat "Satu Halaman" 
+       yang sedang aktif */
+    
+    #cover_checkbox:checked ~ #flip_book {
+        /* Saat cover terbuka, geser sedikit agar halaman isi terlihat di tengah */
+        transform: scale(calc(100vw / 630)) translateX(72px);
+    }
+
+    /* LOGIKA AUTO PANNING (Kamera Geser) */
+    /* Ini membuat efek "Per Halaman". Saat membalik halaman, 
+       buku akan bergeser agar halaman yang aktif ada di tengah layar HP */
+
+    /* Saat Halaman 1 dibalik (Lihat Hal 2 & 3), geser posisi */
+    #page1_checkbox:checked ~ #flip_book {
+        transform: scale(calc(100vw / 630)) translateX(20px); /* Geser ke tengah */
+    }
+    
+    /* Saat Halaman 2 dibalik */
+    #page2_checkbox:checked ~ #flip_book {
+        transform: scale(calc(100vw / 630)) translateX(20px);
+    }
+    
+    /* Saat Halaman 3 dibalik */
+    #page3_checkbox:checked ~ #flip_book {
+        transform: scale(calc(100vw / 630)) translateX(20px);
+    }
+    
+    /* Saat Halaman 4 dibalik */
+    #page4_checkbox:checked ~ #flip_book {
+        transform: scale(calc(100vw / 630)) translateX(20px);
+    }
+
+    /* Saat Halaman 5 dibalik */
+    #page5_checkbox:checked ~ #flip_book {
+        transform: scale(calc(100vw / 630)) translateX(20px);
+    }
+
+    /* Saat Halaman 6 dibalik */
+    #page6_checkbox:checked ~ #flip_book {
+        transform: scale(calc(100vw / 630)) translateX(20px);
+    }
+    
+    /* Saat Halaman 7 dibalik (Halaman Terakhir sebelum cover belakang) */
+    #page7_checkbox:checked ~ #flip_book {
+        transform: scale(calc(100vw / 630)) translateX(0px); /* Kembali ke tengah */
+    }
+}

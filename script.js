@@ -3,8 +3,8 @@
 *********************/
 
 const responsiveWarning = document.getElementById("responsive-warning");
-// "true" if the site is optimized for responsive design, "false" if not.
-const responsiveDesign = false;
+// UBAH JADI TRUE AGAR BISA DIBUKA DI HP
+const responsiveDesign = true; 
 
 // Show mobile warning if the user is on mobile and responsive-design is false.
 if (!responsiveDesign && window.innerWidth <= 768) {
